@@ -11,15 +11,9 @@ void kernel_main() {
     if (kb_is_make(sc)) {
       if (sc == 0x0e) vga_delc();
       else {
-        uchar ascii;
-        if (!shift) {
-          ascii = kb_gb_map[sc];
-        } else {
-          ascii = kb_gb_shift_map[sc & !0x08];
-        }
+        uchar ascii = kb_gb_map[sc];
         if (ascii) vga_putc_colour(ascii, VGA_CYAN_ON_GREY);
       }
-    } else {
     }
   }
 }

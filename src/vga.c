@@ -51,6 +51,7 @@ void vga_putc_colour(uchar c, uchar colour) {
   if (c == '\n') {
     __vga_current_y++;
     __vga_current_x = 0;
+    vga_set_cursor_position(__vga_current_x, __vga_current_y);
     return;
   }
   vga_mem[__vga_current_y * VGA_COLS + __vga_current_x] = (VGA_Slot){c, colour};
@@ -68,6 +69,7 @@ void vga_delc(void) {
   __vga_current_x--;
   if (__vga_current_x <= 0) {
     __vga_current_x = 0;
+    __vga_current_y--;
     if (__vga_current_y < 0) {
       __vga_current_y = 0;
     }
