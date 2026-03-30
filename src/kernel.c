@@ -1,11 +1,25 @@
 #include "common.h"
 #include "vga.h"
+#include "keyboard.h"
+
+bool shift = false;
 
 void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
-  vga_disable_cursor();
-  vga_puts_colour("Hello World!\n", VGA_CYAN_ON_GREY);
-  vga_puts_colour("w dua lipa", VGA_CYAN_ON_GREY);
-  for(;;);
+  for(;;) {
+    uchar sc = kb_get_scancode();
+    if (kb_is_make(sc)) {
+      if (sc == 0x0e) vga_delc();
+      else {
+        uchar ascii;
+        if (!shift) {
+          ascii = kb_gb_map[sc];
+        } else {
+          ascii = kb_gb_shift_map[sc & !0x08];
+        }
+        if (ascii) vga_putc_colour(ascii, VGA_CYAN_ON_GREY);
+      }
+    } else {
+    }
+  }
 }
-

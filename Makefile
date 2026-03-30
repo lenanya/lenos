@@ -1,5 +1,5 @@
 CFLAGS = -m32 -ffreestanding -fno-pie -nostdlib -c
-OFILES = build/kernel.o build/common.o build/vga.o build/string.o
+OFILES = build/kernel.o build/common.o build/vga.o build/string.o build/keyboard.o
 
 build/lenos.bin: src/lenos.asm build/kernel.bin
 	fasm src/lenos.asm build/lenos.bin
@@ -18,3 +18,6 @@ build/vga.o: src/vga.c src/vga.h
 	
 build/string.o: src/std/string.c src/std/string.h
 	cc $(CFLAGS) src/std/string.c -o build/string.o
+
+build/keyboard.o: src/keyboard.c src/keyboard.h
+	cc $(CFLAGS) src/keyboard.c -o build/keyboard.o

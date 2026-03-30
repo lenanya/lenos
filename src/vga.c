@@ -2,8 +2,8 @@
 #include "vga.h"
 #include "std/string.h"
 
-int __vga_current_x = 0;
-int __vga_current_y = 0;
+static int __vga_current_x = 0;
+static int __vga_current_y = 0;
 
 void vga_clear_screen(uchar colour) {
   __vga_current_x = 0;
@@ -61,6 +61,19 @@ void vga_putc_colour(uchar c, uchar colour) {
     __vga_current_x = 0;
   }
   vga_set_cursor_position(__vga_current_x, __vga_current_y);
+}
+
+void vga_delc(void) {
+  VGA_Slot* vga_mem = (VGA_Slot*)VGA_MEM;
+  __vga_current_x--;
+  if (__vga_current_x <= 0) {
+    __vga_current_x = 0;
+    if (__vga_current_y < 0) {
+      __vga_current_y = 0;
+    }
+  }
+  vga_set_cursor_position(__vga_current_x, __vga_current_y);
+  vga_mem[__vga_current_y * VGA_COLS + __vga_current_x].c = ' ';
 }
 
 void vga_puts_colour(char* s, uchar colour) {

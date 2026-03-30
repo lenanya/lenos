@@ -33,5 +33,6 @@ void vga_putc_colour(uchar c, uchar colour);
 void vga_puts_colour(char* s, uchar colour);
 #define vga_putc(c) vga_putc_colour(c, VGA_WHITE_ON_BLACK) 
 #define vga_puts(s) vga_puts_colour(s, VGA_WHITE_ON_BLACK) 
+void vga_delc(void);
 
 #endif // VGA_H
