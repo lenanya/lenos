@@ -6,6 +6,7 @@ bool shift = false;
 
 void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
+  vga_flip();
   for(;;) {
     uchar sc = kb_get_scancode();
     if (kb_is_make(sc)) {
@@ -15,5 +16,6 @@ void kernel_main() {
         if (ascii) vga_putc_colour(ascii, VGA_CYAN_ON_GREY);
       }
     }
+    vga_flip();
   }
 }

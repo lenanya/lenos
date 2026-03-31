@@ -244,7 +244,6 @@ smaperrmsglen = $-smaperrmsg
 
 use32
 
-VGABUF = 0xb8000
 
 init_protected:
 	; set up segments, again

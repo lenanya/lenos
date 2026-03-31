@@ -24,6 +24,13 @@ typedef struct {
   uchar colour;
 } VGA_Slot;
 
+typedef enum {
+  D_UP,
+  D_DOWN
+} Direction;
+
+typedef VGA_Slot VGA_Row[80];
+
 void vga_set_cursor_position(int x, int y);
 void vga_wait_for_vblank(void);
 void vga_disable_cursor(void);
@@ -34,5 +41,7 @@ void vga_puts_colour(char* s, uchar colour);
 #define vga_putc(c) vga_putc_colour(c, VGA_WHITE_ON_BLACK) 
 #define vga_puts(s) vga_puts_colour(s, VGA_WHITE_ON_BLACK) 
 void vga_delc(void);
+void vga_flip(void);
+void vga_scroll(Direction d, uchar colour);
 
 #endif // VGA_H
