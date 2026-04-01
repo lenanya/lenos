@@ -9,3 +9,9 @@ uchar inb(ushort port) {
   asm volatile ("inb %w1, %b0" : "=a"(res) : "Nd"(port) : "memory");
   return res;
 }
+
+ushort inw(ushort port) {
+  ushort ret;
+  asm volatile ("inw %w1, %w0" : "=a"(ret) : "Nd"(port));
+  return ret;
+}

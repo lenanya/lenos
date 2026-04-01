@@ -44,7 +44,7 @@ void vga_wait_for_vblank(void) {
   // wait for any current vblank to end
   while (inb(VGA_STATUS) & 0x08);
   // wait for the next one 
-  while (!inb(VGA_STATUS) & 0x08);
+  while (!(inb(VGA_STATUS) & 0x08));
 }
 
 void vga_putc_colour(uchar c, uchar colour) {
@@ -79,7 +79,9 @@ void vga_delc(void) {
       __vga_current_y = 0;
     }
   }
-  while (screen_buf[__vga_current_y][__vga_current_x].c == 0 && __vga_current_x >= 0) __vga_current_x--;
+  while (screen_buf[__vga_current_y][__vga_current_x].c == 0 && __vga_current_x >= 0) {
+      __vga_current_x--;
+  }
   __vga_current_x++;
   vga_set_cursor_position(__vga_current_x, __vga_current_y);
 }

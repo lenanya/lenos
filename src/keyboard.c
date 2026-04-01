@@ -11,7 +11,7 @@ bool kb_is_release(uchar scancode) {
 
 uchar kb_get_scancode(void) {
   // wait for scancode 
-  while (!(inb(KB_STATUS) & 0x01));
+  while (!(inb(KB_CTRL) & 0x01));
 
   return inb(KB_DATA);
 }

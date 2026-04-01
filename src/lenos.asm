@@ -256,9 +256,9 @@ init_protected:
 
 	; set up stack, again
 	mov esp, 0x90000
+	and esp, -16
 	mov ebp, esp
 
-	call c_kernel
 	jmp 0x9000
 
 sector_count = (($-init_stage2)+511)/512
@@ -269,6 +269,76 @@ c_kernel:
 	file "../build/kernel.bin"
 
 sector_count_c = (($-c_kernel)+511)/512
-display "Reading ", sector_count_c + '0', " extra C sectors from Disk", 10
 times 512 * sector_count_c - ($-c_kernel) db 0
 
+
+; SUPERBLOCK
+; ------------------------------------------------------------------------------
+org 0
+
+superblock_start:
+dd 0x4c454653
+dd 3 ; sector count
+dd 2 ; entry count 
+dd raw_first_lba ; data lba
+dd 512    ; block size
+dd 00001 ; version
+dd raw_first_lba + 3 ; next free
+superblock_end:
+times 512 - (superblock_end - superblock_start) db 0
+
+
+; END OF SUPERBLOCK
+;-------------------------------------------------------------------------------
+
+; START OF LFS TABLE
+;-------------------------------------------------------------------------------
+table_start:
+db "test.txt" ; filename
+times 32 - 8 db 0
+db 0 ; filetype = FILE
+dd 26 ; size 
+db 0 ; deleted = false
+db 1 ; last = no
+dd raw_first_lba ; lba of first
+times 29 db 0xff
+
+db "test2.txt" ; filename
+times 32 - 9 db 0
+db 0 ; filetype = FILE
+dd 534 ; size 
+db 0 ; deleted = false
+db 1 ; last = yes
+dd raw_first_lba+1 ; lba of first
+times 29 db 0xff
+
+table_end:
+times 512 - (table_end - table_start) db 0xfe
+
+; RAW DATA
+;-------------------------------------------------------------------------------
+raw_start:
+raw_first_lba = 18
+
+
+dd 0 ; next lba
+filedat: db "HELLO FROM A FILE!!!!!!!", 10, 0
+
+raw_end:
+times 512 - (raw_end - raw_start) db 0
+
+
+raw2_start:
+dd 20
+times 508 db 'a'
+raw2_end:
+
+times 512 - (raw2_end - raw2_start) db 0
+
+raw3_start:
+dd 0
+db "hello from a second file!", 10, 0
+times 13 db 0
+raw3_end:
+
+times 512 - (raw3_end - raw3_start) db 0

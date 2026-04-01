@@ -15,6 +15,7 @@
 #define VGA_CYAN_ON_GREY   0x83
 #define VGA_RED_ON_BLACK   0x04
 #define VGA_WHITE_ON_BLACK 0x0f
+#define VGA_RED_ON_GREY    0x84
 
 #define VGA_COLS 80
 #define VGA_ROWS 25
