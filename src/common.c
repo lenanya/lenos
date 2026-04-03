@@ -15,3 +15,7 @@ ushort inw(ushort port) {
   asm volatile ("inw %w1, %w0" : "=a"(ret) : "Nd"(port));
   return ret;
 }
+
+void outw(ushort port, ushort w) {
+  asm volatile ("outw %w0, %w1" : : "a"(w), "Nd"(port) : "memory");
+}

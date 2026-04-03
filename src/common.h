@@ -13,5 +13,6 @@ typedef unsigned long long ulong;
 void outb(ushort port, uchar val);
 uchar inb(ushort port);
 ushort inw(ushort port);
+void outw(ushort port, ushort w);
 
 #endif //COMMON_H

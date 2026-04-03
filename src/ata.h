@@ -12,10 +12,12 @@
 
 
 #define ATA_READ   0x20
+#define ATA_WRITE  0x30
 #define ATA_BUSY   0x80
 #define ATA_READY  0x08
 
 void ata_wait_for_ready(void);
 void ata_read_sectors(uint lba, uchar count, ushort* dest);
+void ata_write_sector(uint lba, ushort* data);
 
 #endif // ATA_H

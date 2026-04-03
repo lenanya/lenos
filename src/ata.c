@@ -24,3 +24,23 @@ void ata_read_sectors(uint lba, uchar count, ushort* dest) {
     }
   }
 }
+
+void ata_write_sector(uint lba, ushort* data) {
+  outb(ATA_DEVICE_LBA, (0xe0 | ((lba >> 24) & 0x0f)));
+  outb(ATA_SEC_COUNT, 1);
+  outb(ATA_LBA_LOW, (ushort)lba);
+  outb(ATA_LBA_MID, (ushort)(lba >> 8));
+  outb(ATA_LBA_HIGH, (ushort)(lba >> 16));
+
+  outb(ATA_CMD_STAT, ATA_WRITE);
+
+  while (!(inb(ATA_CMD_STAT) & ATA_READY));
+
+  for (int i = 0; i < 256; ++i) {
+    outw(ATA_DATA, data[i]);
+  }
+
+  outb(ATA_CMD_STAT, 0xe7);
+
+  while (inb(ATA_CMD_STAT), ATA_BUSY);
+}

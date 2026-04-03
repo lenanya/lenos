@@ -299,9 +299,9 @@ times 32 - 8 db 0
 db 0 ; filetype = FILE
 dd 26 ; size 
 db 0 ; deleted = false
-db 1 ; last = no
+db 0 ; last = no
 dd raw_first_lba ; lba of first
-times 29 db 0xff
+times 29 db 0
 
 db "test2.txt" ; filename
 times 32 - 9 db 0
@@ -310,15 +310,15 @@ dd 534 ; size
 db 0 ; deleted = false
 db 1 ; last = yes
 dd raw_first_lba+1 ; lba of first
-times 29 db 0xff
+times 29 db 0
 
 table_end:
-times 512 - (table_end - table_start) db 0xfe
+times 512 - (table_end - table_start) db 0
 
 ; RAW DATA
 ;-------------------------------------------------------------------------------
 raw_start:
-raw_first_lba = 18
+raw_first_lba = 20
 
 
 dd 0 ; next lba
@@ -329,7 +329,7 @@ times 512 - (raw_end - raw_start) db 0
 
 
 raw2_start:
-dd 20
+dd raw_first_lba + 2
 times 508 db 'a'
 raw2_end:
 

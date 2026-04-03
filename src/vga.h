@@ -39,8 +39,8 @@ void vga_enable_cursor(void);
 void vga_clear_screen(uchar colour);
 void vga_putc_colour(uchar c, uchar colour);
 void vga_puts_colour(char* s, uchar colour);
-#define vga_putc(c) vga_putc_colour(c, VGA_WHITE_ON_BLACK) 
-#define vga_puts(s) vga_puts_colour(s, VGA_WHITE_ON_BLACK) 
+#define vga_putc(c) vga_putc_colour(c, VGA_CYAN_ON_GREY) 
+#define vga_puts(s) vga_puts_colour(s, VGA_CYAN_ON_GREY) 
 void vga_delc(void);
 void vga_flip(void);
 void vga_scroll(Direction d, uchar colour);

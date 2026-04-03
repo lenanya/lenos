@@ -6,8 +6,10 @@
 
 void read_entire_file(File_Buffer* fb, char* filename) {
   LFS_Table_Entry* te = lfs_find_file(filename);
+  
   if (!te) {
     fb->exists = false;
+    return;
   } else {
     fb->exists = true;
   }
