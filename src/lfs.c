@@ -47,6 +47,33 @@ LFS_Table_Entry* lfs_find_file(char* name) {
   return NULL;
 }
 
+void lfs_read_directory(Directory* dir) {
+  if (__lfs_superblock == NULL) lfs_get_superblock();
+  if (__lfs_superblock == NULL) return;
+  if (__lfs_superblock->entry_count < 1) return;
+  LFS_Table_Entry* te = NULL;
+  uint block = 1;
+  ushort* volatile block_buf = (ushort*)malloc(512);
+  while (!te->last) {
+    if (__lfs_superblock_lba + block > LFS_MAX_BLOCKS) return;
+    ata_read_sectors(__lfs_superblock_lba + block, 1, block_buf);
+    te = (LFS_Table_Entry*)block_buf;
+    while ((uint)te < __lfs_superblock + 2 * 512) {
+      if (te->deleted) {
+        if (te->last) {
+          break;
+        } else te++;
+      } else {
+        da_append(dir, (LFS_Table_Entry*)memdup(te, sizeof(LFS_Table_Entry)));
+        if (te->last) break;
+        te++;
+      }
+    }
+    block++;
+  };
+  free(block_buf);
+} 
+
 void lfs_create_file(char* name, File_Buffer* fb) {
   while (1);
 }

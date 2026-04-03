@@ -41,7 +41,14 @@ typedef struct {
   bool exists;
 } __attribute__((packed)) LFS_File;
 
+typedef struct Directory {
+  LFS_Table_Entry** items;
+  uint size;
+  uint capacity;
+} Directory;
+
 void lfs_get_superblock(void);
 LFS_Table_Entry* lfs_find_file(char* name);
+void lfs_read_directory(Directory* dir);
 
 #endif // LFS_H

@@ -72,7 +72,23 @@ void kernel_main() {
         vga_putc(10);
         vga_flip();
       }
-    } else {
+    } else if (strcmp(cmd.items, "ls") == true) {
+      Directory dir = {0};
+      lfs_read_directory(&dir);
+
+      for (int i = 0; i < dir.size; ++i) {
+        vga_putc(' ');
+        vga_puts(dir.items[i]->name);
+        vga_puts("      ");
+        vga_puts(itoa(dir.items[i]->file_size));
+        vga_putc('B');
+        vga_putc(10);
+        vga_flip();
+      }
+    } else if (strcmp(cmd.items, "clear") == true) {
+      vga_clear_screen(VGA_CYAN_ON_GREY);
+      vga_flip();
+    }else {
       vga_puts_colour(" ERROR: Unknown command: ", VGA_RED_ON_GREY);
       vga_puts_colour(cmd.items, VGA_RED_ON_GREY);
       vga_putc_colour(10, VGA_RED_ON_GREY);

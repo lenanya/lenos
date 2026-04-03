@@ -10,8 +10,9 @@ typedef struct {
 } __attribute__((packed)) String_Buffer;
 
 int strlen(char* s);
-void strdup(char* src, char* dest);
+char* strdup(char* s);
 bool strcmp(char* a, char* b);
 bool strncmp(char* a, char* b, uint n);
+char* itoa(int i);
 
 #endif // STRING_H

@@ -136,3 +136,9 @@ void* calloc(uint size, char b) {
 	}
 	return mem;
 }
+
+void* memdup(void* mem, uint size) {
+	void* new = malloc(size);
+	memncpy(mem, new, size);
+	return new;
+}

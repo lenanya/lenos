@@ -30,5 +30,6 @@ void* malloc(uint size);
 void free(void* mem);
 void* realloc(void* mem, uint new_size);
 void* calloc(uint size, char b);
+void* memdup(void* mem, uint size);
 
 #endif // MEM_H

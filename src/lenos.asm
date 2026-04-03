@@ -318,7 +318,7 @@ times 512 - (table_end - table_start) db 0
 ; RAW DATA
 ;-------------------------------------------------------------------------------
 raw_start:
-raw_first_lba = 20
+raw_first_lba = sector_count + sector_count_c + 3
 
 
 dd 0 ; next lba
