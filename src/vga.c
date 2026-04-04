@@ -9,7 +9,7 @@ static int __vga_current_y = 0;
 static VGA_Row* screen_buf = (VGA_Row*)(0xb9000);
 static VGA_Row* vga_mem    = (VGA_Row*)VGA_MEM;
 
-void vga_clear_screen(uchar colour) {
+void vga_clear_screen(u8 colour) {
   __vga_current_x = 0;
   __vga_current_y = 0;
   vga_set_cursor_position(0, 0);
@@ -31,13 +31,13 @@ void vga_enable_cursor(void) {
 }
 
 void vga_set_cursor_position(int x, int y) {
-  ushort pos = y * VGA_COLS + x;
+  u16 pos = y * VGA_COLS + x;
 
   outb(VGA_INDEX, VGA_CURSOR_H);
-  outb(VGA_DATA, (uchar)(pos >> 8) & 0xff);
+  outb(VGA_DATA, (u8)(pos >> 8) & 0xff);
 
   outb(VGA_INDEX, VGA_CURSOR_L);
-  outb(VGA_DATA, (uchar)(pos & 0xff));
+  outb(VGA_DATA, (u8)(pos & 0xff));
 }
 
 void vga_wait_for_vblank(void) {
@@ -47,7 +47,7 @@ void vga_wait_for_vblank(void) {
   while (!(inb(VGA_STATUS) & 0x08));
 }
 
-void vga_putc_colour(uchar c, uchar colour) {
+void vga_print_char_colour(u8 c, u8 colour) {
   if (c == '\n') {
     __vga_current_y++;
     if (__vga_current_y == VGA_ROWS) {
@@ -68,7 +68,7 @@ void vga_putc_colour(uchar c, uchar colour) {
   vga_set_cursor_position(__vga_current_x, __vga_current_y);
 }
 
-void vga_delc(void) {
+void vga_remove_character(void) {
   __vga_current_x--;
   screen_buf[__vga_current_y][__vga_current_x].c = 0;
   if (__vga_current_x <= 0) {
@@ -86,14 +86,14 @@ void vga_delc(void) {
   vga_set_cursor_position(__vga_current_x, __vga_current_y);
 }
 
-void vga_puts_colour(char* s, uchar colour) {
+void vga_print_string_colour(char* s, u8 colour) {
   int l = strlen(s);
   for (int i = 0; i < l; ++i) {
-    vga_putc_colour(s[i], colour);
+    vga_print_char_colour(s[i], colour);
   }
 }
 
-void vga_flip(void) {
+void vga_flip_buffer(void) {
   vga_wait_for_vblank();
   for (int y = 0; y < VGA_ROWS; ++y) {
     for (int x = 0; x < VGA_COLS; ++x) {
@@ -105,7 +105,7 @@ void vga_flip(void) {
   }
 }
 
-void vga_scroll(Direction d, uchar colour) {
+void vga_scroll(Direction d, u8 colour) {
   if (d == D_UP) {
     for (int y = 0; y < VGA_ROWS; ++y) {
       for (int x = 0; x < VGA_COLS; ++x) {

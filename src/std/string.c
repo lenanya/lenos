@@ -20,7 +20,7 @@ bool strcmp(char* a, char* b) {
   return true;
 }
 
-bool strncmp(char* a, char* b, uint n) {
+bool strncmp(char* a, char* b, u32 n) {
   for (int i = 0; i < n; ++i) {
     if (a[i] != b[i]) return false;
   }
@@ -34,7 +34,7 @@ char* strdup(char* s) {
   return ret;
 }
 
-char* itoa(int i) {
+char* itoa(i32 i) {
   String_Buffer sb = {0};
   String_Buffer res = {0};
   if (i < 0) {
@@ -42,7 +42,7 @@ char* itoa(int i) {
     i *= -1;
   }
   while (i > 0) {
-    char c = (i%10) + '0';
+    u8 c = (i%10) + '0';
     da_append(&sb, c);
     i = i / 10;
   }

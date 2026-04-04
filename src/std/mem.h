@@ -11,7 +11,7 @@ static void* __HEAP_TOP  = NULL;
 typedef struct Mem_Header Mem_Header;
 
 typedef struct Mem_Header {
-  uint size;
+  u32 size;
   bool is_free;
   Mem_Header* next;
   Mem_Header* prev;
@@ -19,17 +19,17 @@ typedef struct Mem_Header {
 } __attribute__((packed)) Mem_Header;
 
 typedef struct {
-  ulong base;
-  ulong length;
-  uint type;
-  uint acpi;
+  u64 base;
+  u64 length;
+  u32 type;
+  u32 acpi;
 } __attribute__((packed)) SMAP_Entry;
 
-void memncpy(void* src, void* dest, int n);
-void* malloc(uint size);
+void memncpy(void* src, void* dest, u32 n);
+void* malloc(u32 size);
 void free(void* mem);
-void* realloc(void* mem, uint new_size);
-void* calloc(uint size, char b);
-void* memdup(void* mem, uint size);
+void* realloc(void* mem, u32 new_size);
+void* calloc(u32 size, char b);
+void* memdup(void* mem, u32 size);
 
 #endif // MEM_H

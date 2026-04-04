@@ -21,8 +21,8 @@
 #define VGA_ROWS 25
 
 typedef struct {
-  uchar c;
-  uchar colour;
+  u8 c;
+  u8 colour;
 } VGA_Slot;
 
 typedef enum {
@@ -36,13 +36,13 @@ void vga_set_cursor_position(int x, int y);
 void vga_wait_for_vblank(void);
 void vga_disable_cursor(void);
 void vga_enable_cursor(void);
-void vga_clear_screen(uchar colour);
-void vga_putc_colour(uchar c, uchar colour);
-void vga_puts_colour(char* s, uchar colour);
-#define vga_putc(c) vga_putc_colour(c, VGA_CYAN_ON_GREY) 
-#define vga_puts(s) vga_puts_colour(s, VGA_CYAN_ON_GREY) 
-void vga_delc(void);
-void vga_flip(void);
-void vga_scroll(Direction d, uchar colour);
+void vga_clear_screen(u8 colour);
+void vga_print_char_colour(u8 c, u8 colour);
+void vga_print_string_colour(char* s, u8 colour);
+#define vga_print_char(c) vga_print_char_colour(c, VGA_CYAN_ON_GREY) 
+#define vga_print_string(s) vga_print_string_colour(s, VGA_CYAN_ON_GREY) 
+void vga_remove_character(void);
+void vga_flip_buffer(void);
+void vga_scroll(Direction d, u8 colour);
 
 #endif // VGA_H

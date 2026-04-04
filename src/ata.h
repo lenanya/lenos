@@ -17,7 +17,7 @@
 #define ATA_READY  0x08
 
 void ata_wait_for_ready(void);
-void ata_read_sectors(uint lba, uchar count, ushort* dest);
-void ata_write_sector(uint lba, ushort* data);
+void ata_read_sectors(u32 lba, u8 count, u16* dest);
+void ata_write_sector(u32 lba, u16* data);
 
 #endif // ATA_H

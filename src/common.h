@@ -4,15 +4,19 @@
 #define false (bool)0
 #define true (bool)1
 
-typedef unsigned char uchar;
-typedef unsigned short ushort;
+typedef char i8;
+typedef unsigned char u8;
+typedef short i16;
+typedef unsigned short u16;
 typedef char bool;
-typedef unsigned int uint;
-typedef unsigned long long ulong;
+typedef int i32;
+typedef unsigned int u32;
+typedef long long i64;
+typedef unsigned long long u64;
 
-void outb(ushort port, uchar val);
-uchar inb(ushort port);
-ushort inw(ushort port);
-void outw(ushort port, ushort w);
+void outb(u16 port, u8 val);
+u8 inb(u16 port);
+u16 inw(u16 port);
+void outw(u16 port, u16 w);
 
 #endif //COMMON_H

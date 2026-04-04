@@ -1,50 +1,53 @@
 #include "mem.h"
+#include "../vga.h"
+#include "string.h"
+#include "io.h"
 
-void memncpy(void* src, void* dest, int n) {
-	for (int i = 0; i < n; ++i) {
+void memncpy(void* src, void* dest, u32 n) {
+	for (u32 i = 0; i < n; ++i) {
 	((char*)dest)[i] = ((char*)src)[i];
 	}
 }
 
 void mem_setup_heap_vars(void) {
 	SMAP_Entry* smap = (SMAP_Entry*)0x3000;
-	ushort entry_count = *(ushort*)0x2ff0;
-	ulong largest_start = 0;
-	ulong largest_size  = 0;
+	u16 entry_count = *(u16*)0x2ff0;
+	u64 largest_start = 0;
+	u64 largest_size  = 0;
 
-	for (uint i = 0; i < entry_count; ++i) {
+	for (u32 i = 0; i < entry_count; ++i) {
 		if (smap[i].type == 1) {
-			ulong start = smap[i].base;
+			u64 start = smap[i].base;
 			if (start > 0xFFFFFFFF) continue;
 			if (start < 0x90000) continue;
-			ulong end   = smap[i].base + smap[i].length;
+			u64 end   = smap[i].base + smap[i].length;
 			if (end > 0xFFFFFFFF) end = 0xFFFFFFFF;
-			ulong size  = end - start;
+			u64 size  = end - start;
 			if (size > largest_size) {
 				largest_start = start;
 				largest_size = size;
 			}
 		}
 	}
-	ulong largest_end = largest_start + largest_size;
+	u64 largest_end = largest_start + largest_size;
 	if (0xFFFFFFFF - largest_end > largest_size) {
-		__HEAP_BASE = (void*)(uint)largest_end;
+		__HEAP_BASE = (void*)(u32)largest_end;
 		__HEAP_TOP = (void*)0xFFFFFFFF;
 		return;
 	}
 
-	__HEAP_BASE = (void*)(uint)largest_start;
-	__HEAP_TOP  = (void*)(uint)largest_start + largest_size;
+	__HEAP_BASE = (void*)(u32)largest_start;
+	__HEAP_TOP  = (void*)(u32)largest_start + largest_size;
 }
 
-void* malloc(uint size) {
+void* malloc(u32 size) {
 	if (size % 16 != 0) {
 		size += (16 - size % 16);
 	}
 	if (__HEAP_BASE == NULL) {
 		mem_setup_heap_vars();
-		if ((uint)__HEAP_BASE + size > (uint)__HEAP_TOP) return NULL;
-		uint alloc_size = sizeof(Mem_Header) + size;
+		if ((u32)__HEAP_BASE + size > (u32)__HEAP_TOP) return NULL;
+		u32 alloc_size = sizeof(Mem_Header) + size;
 		*((Mem_Header*)__HEAP_BASE) = (Mem_Header) {
 			.size = size,
 			.is_free = false,
@@ -59,6 +62,7 @@ void* malloc(uint size) {
 		next->prev = __HEAP_BASE;
 		next->next = NULL;
 		next->start = next + 1;
+
 		return __HEAP_BASE + sizeof(Mem_Header);
 	}
 
@@ -67,7 +71,7 @@ void* malloc(uint size) {
 		if (header->is_free) {
 			if (header->size >= size) {
 				Mem_Header* next = header->start + size;
-				uint extra_size = 0;
+				u32 extra_size = 0;
 				if (!(header->size == size)) {
 					if (header->size - size < sizeof(Mem_Header) + 1) {
 						extra_size = header->size - size;
@@ -119,17 +123,17 @@ void free(void* mem) {
 	}
 }
 
-void* realloc(void* mem, uint new_size) {
+void* realloc(void* mem, u32 new_size) {
 	if (!mem) return malloc(new_size);
 	Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
-	uint size = header->size;
+	u32 size = header->size;
 	void* new = malloc(new_size);
 	memncpy(mem, new, new_size);
 	free(mem);
 	return new;
 }
 
-void* calloc(uint size, char b) {
+void* calloc(u32 size, char b) {
 	void* mem = malloc(size);
 	for (int i = 0; i < size; ++i) {
 		((char*)mem)[i] = b;
@@ -137,7 +141,7 @@ void* calloc(uint size, char b) {
 	return mem;
 }
 
-void* memdup(void* mem, uint size) {
+void* memdup(void* mem, u32 size) {
 	void* new = malloc(size);
 	memncpy(mem, new, size);
 	return new;

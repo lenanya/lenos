@@ -278,8 +278,8 @@ org 0
 
 superblock_start:
 dd 0x4c454653
-dd 3 ; sector count
-dd 2 ; entry count 
+dd 2*1024*5 ; sector count
+dd 2 ; entry count
 dd raw_first_lba ; data lba
 dd 512    ; block size
 dd 00001 ; version
@@ -306,7 +306,7 @@ times 29 db 0
 db "test2.txt" ; filename
 times 32 - 9 db 0
 db 0 ; filetype = FILE
-dd 534 ; size 
+dd 533 ; size 
 db 0 ; deleted = false
 db 1 ; last = yes
 dd raw_first_lba+1 ; lba of first
@@ -314,13 +314,16 @@ times 29 db 0
 
 table_end:
 times 512 - (table_end - table_start) db 0
+times 512 db 0
+
 
 ; RAW DATA
 ;-------------------------------------------------------------------------------
 raw_start:
-raw_first_lba = sector_count + sector_count_c + 3
+raw_first_lba = sector_count + sector_count_c + 4
 
 
+db 1
 dd 0 ; next lba
 filedat: db "HELLO FROM A FILE!!!!!!!", 10, 0
 
@@ -329,16 +332,19 @@ times 512 - (raw_end - raw_start) db 0
 
 
 raw2_start:
+db 1
 dd raw_first_lba + 2
-times 508 db 'a'
+times 507 db 'a'
 raw2_end:
 
 times 512 - (raw2_end - raw2_start) db 0
 
 raw3_start:
+db 1
 dd 0
 db "hello from a second file!", 10, 0
 times 13 db 0
 raw3_end:
 
 times 512 - (raw3_end - raw3_start) db 0
+times 512 * 2 * 1024 * 5 db 0

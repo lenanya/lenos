@@ -1,0 +1,15 @@
+#ifndef IO_H
+#define IO_H
+
+#include "../common.h"
+#include "../vga.h"
+
+void println(char* s);
+void print(char* s);
+void putc(char c);
+void eprint(char* s);
+void eprintln(char* s);
+void print(char* s);
+void println(char* s);
+
+#endif // IO_H
