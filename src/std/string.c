@@ -50,6 +50,7 @@ char* itoa(i32 i) {
     if (res.size < 1 && sb.items[i] == '0') continue;
     da_append(&res, sb.items[i]);
   }
+  if (sb.size == 0) da_append(&res, '0');
   da_append(&res, 0);
   free(sb.items);
   return res.items;

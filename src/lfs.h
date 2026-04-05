@@ -3,6 +3,7 @@
 #include "common.h"
 
 typedef u8 LFS_Entry_Flags;
+
 #define LFS_MAGIC 0x4c454653
 #define LFS_MAX_BLOCKS 2*1024*1024*5
 
@@ -19,7 +20,8 @@ typedef struct {
   u32 block_size;   // how large one file block is
   u32 lfs_version;  // lfs version
   u32 next_free;    // next free raw data block
-  u8 reserved[512 - (sizeof(u32)*7)];
+  u32 superblock_lba;
+  u8 reserved[512 - (sizeof(u32)*8)];
 } __attribute__((packed)) LFS_Superblock;
 
 typedef struct LFS_Table_Entry LFS_Table_Entry;
@@ -31,7 +33,7 @@ typedef struct LFS_Table_Entry {
   bool deleted;          // 1
   bool last;             // 1
   u32 file_first_lba;   // 4
-  char reserved[64 - 35];
+  char reserved[64-4-1-1-4-1-32];
 } __attribute__((packed)) LFS_Table_Entry;
 
 typedef struct {

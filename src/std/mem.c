@@ -5,7 +5,7 @@
 
 void memncpy(void* src, void* dest, u32 n) {
 	for (u32 i = 0; i < n; ++i) {
-	((char*)dest)[i] = ((char*)src)[i];
+		((char*)dest)[i] = ((char*)src)[i];
 	}
 }
 
@@ -41,6 +41,7 @@ void mem_setup_heap_vars(void) {
 }
 
 void* malloc(u32 size) {
+	//eprintln("malloc called.");
 	if (size % 16 != 0) {
 		size += (16 - size % 16);
 	}
@@ -70,9 +71,9 @@ void* malloc(u32 size) {
 	for (;;) {
 		if (header->is_free) {
 			if (header->size >= size) {
-				Mem_Header* next = header->start + size;
 				u32 extra_size = 0;
 				if (!(header->size == size)) {
+					Mem_Header* next = header->start + size;
 					if (header->size - size < sizeof(Mem_Header) + 1) {
 						extra_size = header->size - size;
 					} else {
@@ -90,7 +91,6 @@ void* malloc(u32 size) {
 					return header->start;
 				}
 				header->is_free = false;
-				header->next = next;
 				return header->start; 
 			} else {
 				if (!header->next) return NULL;
@@ -113,6 +113,8 @@ void free(void* mem) {
 		header->next = header->next->next;
 	}
 
+	if (header->next) header->next->prev = header;
+
 	while (header->prev != NULL && header->prev->is_free) {
 		header->prev->size += header->size + sizeof(Mem_Header);
 		header->prev->next = header->next;
@@ -128,7 +130,7 @@ void* realloc(void* mem, u32 new_size) {
 	Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
 	u32 size = header->size;
 	void* new = malloc(new_size);
-	memncpy(mem, new, new_size);
+	memncpy(mem, new, size);
 	free(mem);
 	return new;
 }

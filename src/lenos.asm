@@ -301,7 +301,7 @@ dd 26 ; size
 db 0 ; deleted = false
 db 0 ; last = no
 dd raw_first_lba ; lba of first
-times 29 db 0
+times 21 db 0
 
 db "test2.txt" ; filename
 times 32 - 9 db 0
@@ -310,7 +310,7 @@ dd 533 ; size
 db 0 ; deleted = false
 db 1 ; last = yes
 dd raw_first_lba+1 ; lba of first
-times 29 db 0
+times 21 db 0
 
 table_end:
 times 512 - (table_end - table_start) db 0

@@ -12,9 +12,9 @@ void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
   vga_flip_buffer();
   String_Buffer cmd = {0};
-  Directory dir = {0};
 
   for (;;) {
+    Directory dir = {0};
     cmd.size = 0;
     print(" > ");
     u8 sc;
@@ -59,7 +59,7 @@ void kernel_main() {
       if (!fb.exists) {
         eprint(" ERROR: ");
         eprint(args);
-        eprintln(" does not exist\n");
+        eprintln(" does not exist");
       } else {
         print(" ");
         println(fb.items);
@@ -91,6 +91,9 @@ void kernel_main() {
     } else {
       eprint(" ERROR: Unknown command: ");
       eprintln(cmd.items);
+    }
+    for (u32 i = 0; i < dir.size; ++i) {
+      free(dir.items[i]);
     }
   }
 }

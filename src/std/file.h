@@ -4,7 +4,7 @@
 #include "../common.h"
 
 typedef struct File_Buffer {
-  u8* items;
+  char* items;
   u32 size;
   u32 capacity;
   bool exists;

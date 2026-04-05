@@ -14,7 +14,7 @@ void read_entire_file(File_Buffer* fb, char* filename) {
     fb->exists = true;
   }
 
-  u16* volatile block_buf = (u16*)malloc(512);
+  u16* block_buf = (u16*)malloc(512);
   u32 lba = te->file_first_lba;
   while (lba != 0) {
     ata_read_sectors(lba, 1, block_buf);
@@ -24,6 +24,8 @@ void read_entire_file(File_Buffer* fb, char* filename) {
       da_append(fb, fbl->data[i]);
     }
   }
+  free(te);
+  free(block_buf);
 }
 
 void write_entire_file(File_Buffer* fb, char* filename) {
