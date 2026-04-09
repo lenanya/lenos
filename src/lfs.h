@@ -3,16 +3,21 @@
 #include "common.h"
 
 typedef u8 LFS_Entry_Flags;
+typedef struct LFS_Superblock LFS_Superblock;
+
 
 #define LFS_MAGIC 0x4c454653
+
 #define LFS_MAX_BLOCKS 2*1024*1024*5
+
+extern LFS_Superblock* sb;
 
 typedef enum LFS_Block_Flags {
   BLOCK_FREE = 0x00,
   BLOCK_USED = 0x01,
 } LFS_Block_FLags;
 
-typedef struct {
+typedef struct LFS_Superblock {
   u32 magic; // magic number for lfs
   u32 sector_count; // how many sectors the data section has
   u32 entry_count;  // how many entries the table has
@@ -33,7 +38,7 @@ typedef struct LFS_Table_Entry {
   bool deleted;          // 1
   bool last;             // 1
   u32 file_first_lba;   // 4
-  char reserved[64-4-1-1-4-1-32];
+  char reserved[64-4-4-1-1-4-1-32];
 } __attribute__((packed)) LFS_Table_Entry;
 
 typedef struct {

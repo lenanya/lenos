@@ -15,6 +15,7 @@ void read_entire_file(File_Buffer* fb, char* filename) {
   }
 
   u16* block_buf = (u16*)malloc(512);
+  give_allocation_name(block_buf, "read_entire_file");
   u32 lba = te->file_first_lba;
   while (lba != 0) {
     ata_read_sectors(lba, 1, block_buf);
@@ -45,6 +46,7 @@ void write_entire_file(File_Buffer* fb, char* filename) {
   }
 
   lfs_append_table(ent);
+  free(ent);
 
   LFS_Superblock* sb = lfs_get_superblock();
   sb->entry_count++;
@@ -60,6 +62,7 @@ void write_entire_file(File_Buffer* fb, char* filename) {
       else fbl->data[i] = fb->items[i];
     }
     ata_write_sector(file, (u16*)fbl);
+    free(fbl);
     return;
   }
 }

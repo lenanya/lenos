@@ -3,10 +3,36 @@
 #include "string.h"
 #include "io.h"
 
+void* __HEAP_BASE = NULL;
+void* __HEAP_TOP = NULL;
+
 void memncpy(void* src, void* dest, u32 n) {
 	for (u32 i = 0; i < n; ++i) {
 		((char*)dest)[i] = ((char*)src)[i];
 	}
+}
+
+void heap_dump(void) {
+	Mem_Header* header = (Mem_Header*)__HEAP_BASE;
+	u32 i = 0;
+	printf("__HEAP_BASE: %p\n", __HEAP_BASE);
+	printf(" __HEAP_TOP: %p\n", __HEAP_TOP);
+	do {
+		printf("%u at %p\n", i, header);
+		printf("     size: %u\n", header->size);
+		printf("  is_free: %b\n", header->is_free);
+		printf("     next: %p\n", header->next);
+		printf("     prev: %p\n", header->prev);
+		if (header->owner) printf("    owner: %s\n", header->owner);
+		println("");
+		++i;
+		header = header->next;
+	} while (header->next);
+	printf("%u at %p\n", i, header);
+	printf("     size: %u\n", header->size);
+	printf("  is_free: %b\n", header->is_free);
+	printf("     next: %p\n", header->next);
+	printf("     prev: %p\n\n", header->prev);
 }
 
 void mem_setup_heap_vars(void) {
@@ -36,14 +62,15 @@ void mem_setup_heap_vars(void) {
 		return;
 	}
 
+	largest_start += (32 - largest_start % 32);
+
 	__HEAP_BASE = (void*)(u32)largest_start;
 	__HEAP_TOP  = (void*)(u32)largest_start + largest_size;
 }
 
 void* malloc(u32 size) {
-	//eprintln("malloc called.");
-	if (size % 16 != 0) {
-		size += (16 - size % 16);
+	if (size % 32 != 0) {
+		size += (32 - size % 32);
 	}
 	if (__HEAP_BASE == NULL) {
 		mem_setup_heap_vars();
@@ -52,17 +79,15 @@ void* malloc(u32 size) {
 		*((Mem_Header*)__HEAP_BASE) = (Mem_Header) {
 			.size = size,
 			.is_free = false,
-			.next = __HEAP_BASE+alloc_size,
+			.next = (Mem_Header*)((addr)__HEAP_BASE + alloc_size),
 			.prev = NULL,
-			.start = __HEAP_BASE + sizeof(Mem_Header)
 		};
 
-		Mem_Header* next = ((Mem_Header*)(__HEAP_BASE + alloc_size));
+		Mem_Header* next = ((Mem_Header*)((addr)__HEAP_BASE + alloc_size));
 		next->size = __HEAP_TOP - __HEAP_BASE - alloc_size;
 		next->is_free = true;
-		next->prev = __HEAP_BASE;
+		next->prev = (Mem_Header*)__HEAP_BASE;
 		next->next = NULL;
-		next->start = next + 1;
 
 		return __HEAP_BASE + sizeof(Mem_Header);
 	}
@@ -73,7 +98,7 @@ void* malloc(u32 size) {
 			if (header->size >= size) {
 				u32 extra_size = 0;
 				if (!(header->size == size)) {
-					Mem_Header* next = header->start + size;
+					Mem_Header* next = (Mem_Header*)((addr)header + sizeof(Mem_Header) + size);
 					if (header->size - size < sizeof(Mem_Header) + 1) {
 						extra_size = header->size - size;
 					} else {
@@ -82,16 +107,19 @@ void* malloc(u32 size) {
 							.is_free = true,
 							.next = header->next,
 							.prev = header,
-							.start = next + 1
 						};
 					}
 					header->is_free = false;
 					header->size = size + extra_size;
-					header->next = next;
-					return header->start;
+					if (next) {
+						header->next = next;
+					} else {
+						header->next = NULL;
+					}
+					return (addr)header + sizeof(Mem_Header);
 				}
 				header->is_free = false;
-				return header->start; 
+				return (addr)header + sizeof(Mem_Header); 
 			} else {
 				if (!header->next) return NULL;
 				header = header->next; 
@@ -105,8 +133,9 @@ void* malloc(u32 size) {
 
 void free(void* mem) {
 	if (!mem) return;
-	Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
+	Mem_Header* header = (Mem_Header*)((addr)mem - sizeof(Mem_Header));
 	header->is_free = true;
+	header->owner = NULL;
 	if (header->next == NULL) return;
 	while (header->next != NULL && header->next->is_free) {
 		header->size += header->next->size + sizeof(Mem_Header);
@@ -127,11 +156,18 @@ void free(void* mem) {
 
 void* realloc(void* mem, u32 new_size) {
 	if (!mem) return malloc(new_size);
+	// freeing early is fine here since theres no way for that memory
+	// to change after this
+	free(mem);
+	if (new_size % 32 != 0) {
+		new_size += (32 - new_size % 32);
+	}
 	Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
 	u32 size = header->size;
+
 	void* new = malloc(new_size);
+	give_allocation_name(new, header->owner);
 	memncpy(mem, new, size);
-	free(mem);
 	return new;
 }
 
@@ -145,6 +181,12 @@ void* calloc(u32 size, char b) {
 
 void* memdup(void* mem, u32 size) {
 	void* new = malloc(size);
+	give_allocation_name(new, "memdup");
 	memncpy(mem, new, size);
 	return new;
+}
+
+void give_allocation_name(void* mem, char* name) {
+  Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
+	header->owner = name;
 }

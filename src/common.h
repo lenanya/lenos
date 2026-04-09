@@ -13,6 +13,7 @@ typedef int i32;
 typedef unsigned int u32;
 typedef long long i64;
 typedef unsigned long long u64;
+typedef u8* addr;
 
 void outb(u16 port, u8 val);
 u8 inb(u16 port);

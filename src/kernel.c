@@ -3,6 +3,7 @@
 #include "keyboard.h"
 #include "lfs.h"
 
+#include "std/mem.h"
 #include "std/string.h"
 #include "std/da.h"
 #include "std/file.h"
@@ -12,9 +13,9 @@ void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
   vga_flip_buffer();
   String_Buffer cmd = {0};
+  Directory dir = {0};
 
   for (;;) {
-    Directory dir = {0};
     cmd.size = 0;
     print(" > ");
     u8 sc;
@@ -29,11 +30,13 @@ void kernel_main() {
         }
       }
       u8 ascii = kb_gb_map[sc];
+      if (cmd.size >= 72) continue;
       if (ascii) {
         da_append(&cmd, ascii);
         putc(ascii);
       }
     } while (sc != 28);
+    vga_flip_buffer();
     cmd.size--; // remove newline
     da_append(&cmd, 0);
     if (cmd.size < 1) continue;
@@ -67,13 +70,10 @@ void kernel_main() {
     } else if (strcmp(cmd.items, "ls") == true) {
       dir.size = 0;
       lfs_read_directory(&dir);
+      printf("%p\n", dir);
 
       for (int i = 0; i < dir.size; ++i) {
-        print(" ");
-        print(dir.items[i]->name);
-        print("      ");
-        print(itoa(dir.items[i]->file_size));
-        println("B");
+        printf(" %s   %dB\n", dir.items[i]->name, dir.items[i]->file_size);
       }
     } else if (strcmp(cmd.items, "clear") == true) {
       vga_clear_screen(VGA_CYAN_ON_GREY);
@@ -88,6 +88,8 @@ void kernel_main() {
         da_append(&fb, args[i]);
       }
       write_entire_file(&fb, name);
+    } else if (strcmp(cmd.items, "dump") == true) {
+      heap_dump();
     } else {
       eprint(" ERROR: Unknown command: ");
       eprintln(cmd.items);

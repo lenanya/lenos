@@ -5,8 +5,8 @@
 #define NULL ((void*)0)
 #define MEM_MIN_ALLOC 16
 
-static void* __HEAP_BASE = NULL;
-static void* __HEAP_TOP  = NULL;
+extern void* __HEAP_BASE;
+extern void* __HEAP_TOP;
 
 typedef struct Mem_Header Mem_Header;
 
@@ -15,7 +15,7 @@ typedef struct Mem_Header {
   bool is_free;
   Mem_Header* next;
   Mem_Header* prev;
-  Mem_Header* start;
+  char* owner;
 } __attribute__((packed)) Mem_Header;
 
 typedef struct {
@@ -31,5 +31,7 @@ void free(void* mem);
 void* realloc(void* mem, u32 new_size);
 void* calloc(u32 size, char b);
 void* memdup(void* mem, u32 size);
+void heap_dump(void);
+void give_allocation_name(void* mem, char* name);
 
 #endif // MEM_H

@@ -55,9 +55,37 @@ void printf(char* fmt, ...) {
           free(temp);
           break;
         }
+        case 'u': {
+          u32 arg = va_arg(args, u32);
+          char* temp = utoa(arg);
+          print(temp);
+          free(temp);
+          break;
+        }
         case 's': {
           char* arg = va_arg(args, char*);
           print(arg);
+          break;
+        }
+        case 'c': {
+          i32 arg = va_arg(args, i32);
+          putc(arg);
+          break;
+        }
+        case 'b': {
+          u8 arg = (u8)va_arg(args, i32);
+          if (arg) {
+            print("true");
+          } else {
+            print("false");
+          }
+          break;
+        }
+        case 'p': {
+          void* arg = va_arg(args, void*);
+          char* temp = u32_to_hex((u32)arg);
+          print(temp);
+          free(temp);
           break;
         }
         default: {

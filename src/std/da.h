@@ -8,6 +8,7 @@
   if ((da)->capacity == 0) {                                      \
     (da)->capacity = DA_INITIAL_SIZE;                             \
     (da)->items = malloc((da)->capacity);                         \
+    give_allocation_name((da)->items, "da_append");               \
   }                                                               \
   if ((da)->size > (da)->capacity) {                              \
     (da)->capacity = (da)->capacity * 2;                          \

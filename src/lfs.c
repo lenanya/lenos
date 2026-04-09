@@ -10,7 +10,11 @@ LFS_Superblock* sb = NULL;
 
 LFS_Superblock* lfs_get_superblock(void) {
   u16* block_buf = (u16*)malloc(512);
-  if (!sb) sb = malloc(sizeof(LFS_Superblock));
+  give_allocation_name(block_buf, "lfs_get_superblock");
+  if (!sb) {
+    sb = malloc(sizeof(LFS_Superblock));
+    give_allocation_name(sb, "sb");
+  }
   u32 block = 1;
   do {
     for (u32 i = 0; i < 256; ++i) block_buf[i] = 0;
@@ -28,10 +32,6 @@ LFS_Superblock* lfs_get_superblock(void) {
   return NULL;
 }
 
-LFS_Superblock* lfs_get_superblock_ptr() {
-  return lfs_get_superblock();
-}
-
 void lfs_write_superblock(LFS_Superblock* sb) {
   ata_write_sector(sb->superblock_lba, (u16*)sb);
 }
@@ -41,6 +41,7 @@ void lfs_append_table(LFS_Table_Entry* te) {
   u32 lba = lfs_find_first_free_table_block();
   u32 index = sb_local->entry_count % 8;
   u16* block_buffer = (u16*)malloc(512);
+  give_allocation_name(block_buffer, "lfs_append_table");
   ata_read_sectors(lba, 1, block_buffer);
   memncpy(te, ((LFS_Table_Entry*)block_buffer)+index, sizeof(LFS_Table_Entry));
   if (index > 0) {
@@ -63,6 +64,7 @@ LFS_Table_Entry* lfs_find_file(char* name) {
   LFS_Table_Entry* te = NULL;
   u32 block = 1;
   u16* volatile block_buf = (u16*)malloc(512);
+  give_allocation_name(block_buf, "lfs_find_file");
   while (block < LFS_MAX_BLOCKS) {
     if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) return NULL;
     ata_read_sectors(sb_local->superblock_lba + block, 1, block_buf);
@@ -89,6 +91,7 @@ u32 lfs_find_first_free() {
   LFS_Superblock* sb_local = lfs_get_superblock();
   if (sb_local == NULL) return 0;
   u16* volatile block_buf = (u16*)malloc(512);
+  give_allocation_name(block_buf, "lfs_find_first_free");
   LFS_File_Block* te = NULL;
   u32 lba = sb_local->data_lba;
   while (lba < LFS_MAX_BLOCKS) {
@@ -109,6 +112,7 @@ u32 lfs_find_second_free() {
   LFS_Superblock* sb_local = lfs_get_superblock();
   u32 first = lfs_find_first_free();
   u16* volatile block_buf = (u16*)malloc(512);
+  give_allocation_name(block_buf, "lfs_find_second_free");
   LFS_File_Block* te = NULL;
   u32 lba = first + 1;
   while (lba < LFS_MAX_BLOCKS) {
@@ -134,7 +138,7 @@ u32 lfs_find_first_free_table_block() {
   LFS_Table_Entry* te = NULL;
   u16 block = 1;
   while (block < LFS_MAX_BLOCKS) {
-    if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) return 0;
+    if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
     ata_read_sectors(sb_local->superblock_lba + block, 1, block_buf);
     te = (LFS_Table_Entry*)block_buf;
     u32 section = 0;
@@ -160,13 +164,17 @@ void lfs_read_directory(Directory* dir) {
   LFS_Superblock* sb_local = lfs_get_superblock();
   if (sb_local == NULL) return;
   if (sb_local->entry_count < 1) return;
+  for (u32 i = 0; i < dir->size; ++i) {
+    free(dir->items[i]);
+  }
   dir->size = 0;
   LFS_Table_Entry* te = NULL;
   u32 block = 1;
-  u16* volatile block_buf = (u16*)calloc(512, 0);
+  u16* block_buf = (u16*)calloc(512, 0);
+  give_allocation_name(block_buf, "lfs_read_directory");
   te = (LFS_Table_Entry*)block_buf;
   while (!te->last) {
-    if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) return;
+    if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
     ata_read_sectors(sb_local->superblock_lba + block, 1, block_buf);
     te = (LFS_Table_Entry*)block_buf;
     while ((u32)te < (u32)block_buf+512) {
@@ -182,13 +190,8 @@ void lfs_read_directory(Directory* dir) {
     }
     block++;
   };
-  eprintln(itoa(dir->size));
   free(block_buf);
 } 
-
-void lfs_create_file(char* name, File_Buffer* fb) {
-  while (1);
-}
 
 void lfs_file_block_free(LFS_File_Block* b) {
   free(b->data);
