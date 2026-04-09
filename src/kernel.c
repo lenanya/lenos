@@ -91,6 +91,15 @@ void kernel_main() {
       free(fb.items);
     } else if (strcmp(cmd.items, "dump") == true) {
       heap_dump();
+    } else if (strcmp(cmd.items, "big") == true) {
+      File_Buffer fb = {0};
+      for (u32 j = 0; j < 3; ++j) {
+        for (u32 i = 0; i < 507; ++i) {
+          da_append(&fb, '1' + j);
+        }
+      }
+      write_entire_file(&fb, "test3.txt");
+      free(fb.items);
     } else {
       eprint(" ERROR: Unknown command: ");
       eprintln(cmd.items);

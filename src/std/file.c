@@ -35,27 +35,20 @@ void write_entire_file(File_Buffer* fb, char* filename) {
   if (!file) return;
   u32 table = lfs_find_first_free_table_block();
   if (!table) return;
-  LFS_Table_Entry* ent = malloc(sizeof(LFS_Table_Entry));
+  LFS_Table_Entry* ent = calloc(sizeof(LFS_Table_Entry), 0);
   ent->deleted = false;
-  ent->file_first_lba = file;
   ent->file_size = fb->size;
   ent->flags = 0;
   ent->last = 1;
 
-  for (int i = 0; i < strlen(filename) && i < 32; ++i) {
+  for (u32 i = 0; i < strlen(filename) && i < 32; ++i) {
     ent->name[i] = filename[i];
   }
 
-  lfs_append_table(ent);
-  free(ent);
-
-  LFS_Superblock* sb = lfs_get_superblock();
-  sb->entry_count++;
-  lfs_write_superblock(sb);
-
   LFS_File_Block* fbl = malloc(sizeof(LFS_File_Block));
 
-  if (fb->size % 512 != 0) {
+
+  if (fb->size <= 507) {
     fbl->flags = BLOCK_USED;
     fbl->next_block_lba = 0;
     for (u32 i = 0; i < 507; ++i) {
@@ -64,8 +57,35 @@ void write_entire_file(File_Buffer* fb, char* filename) {
     }
     ata_write_sector(file, (u16*)fbl);
     free(fbl);
-    return;
+  } else {
+    u32 padding = 507 - (fb->size % 507);
+    u32 block_count = (fb->size + padding) / 507;
+    i32 block_index = block_count - 2;
+    u32 prev_block = 0;
+    while (block_index >= 0) {
+      u32 start = block_index * 507;
+      fbl->flags = BLOCK_USED;
+      fbl->next_block_lba = prev_block;
+      prev_block = file;
+      for (u32 i = 0; i < 507; ++i) {
+        if (start + i >= fb->size) {
+          fbl->data[i] = 0;
+        } else {
+          fbl->data[i] = fb->items[start + i];
+        }
+      }
+      ata_write_sector(file, (u16*)fbl);
+      if (block_index > 0) {
+        file = lfs_find_first_free();
+      }
+      block_index--;
+    }
+    free(fbl);
+    
   }
+  ent->file_first_lba = file;
+  lfs_append_table(ent);
+  free(ent);
 }
 
 void file_buffer_free(File_Buffer* fb) {

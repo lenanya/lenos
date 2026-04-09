@@ -105,23 +105,23 @@ LFS_Table_Entry* lfs_find_file(char* name) {
 
 u32 lfs_find_first_free() {
   LFS_Superblock* sb_local = lfs_get_superblock();
-  if (sb_local == NULL) return 0;
+  if (sb_local == NULL) while(1);
   u16* volatile block_buf = (u16*)malloc(512);
   give_allocation_name(block_buf, "lfs_find_first_free");
-  LFS_File_Block* te = NULL;
+  LFS_File_Block* fb = NULL;
   u32 lba = sb_local->data_lba;
   while (lba < LFS_MAX_BLOCKS) {
     ata_read_sectors(lba, 1, block_buf);
-    te = (LFS_File_Block*)block_buf;
+    fb = (LFS_File_Block*)block_buf;
     
-    if (!te->flags) {
+    if (!fb->flags) {
       free(block_buf);
       return lba;
     }
     lba++;
   }
   free(block_buf);
-  return 0;
+  while(1);
 }
 
 u32 lfs_find_second_free() {
@@ -148,30 +148,26 @@ u32 lfs_find_second_free() {
 }
 
 u32 lfs_find_first_free_table_block() {
-  LFS_Superblock* sb_local = lfs_get_superblock();
-  if (sb_local == NULL) return 0;
-  u16* volatile block_buf = (u16*)malloc(512);
-  LFS_Table_Entry* te = NULL;
-  u16 block = 1;
+  LFS_Superblock* sb = lfs_get_superblock();
+  u8* block_buf = (u8*)malloc(512);
+  u32 block = 1;
+
   while (block < LFS_MAX_BLOCKS) {
-    if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
-    ata_read_sectors(sb_local->superblock_lba + block, 1, block_buf);
-    te = (LFS_Table_Entry*)block_buf;
-    u32 section = 0;
-    while ((u32)te < (u32)block_buf+512) {
-      if (te->last) {
-        if (section == 7) {
-          free(block_buf);
-          return sb_local->superblock_lba + block + 1;
+    u32 current_lba = sb->superblock_lba + block;
+    ata_read_sectors(current_lba, 1, (u16*)block_buf);
+    LFS_Table_Entry* entries = (LFS_Table_Entry*)block_buf;
+    
+    for (u32 sector = 0; sector < 8; ++sector) {
+      if (entries[sector].last) {
+        if (sector == 7) {
+          return current_lba+1;
+        } else {
+          return current_lba;
         }
-        free(block_buf);
-        return (sb_local->superblock_lba + block);
       }
-      te++;
-      section++;
     }
     block++;
-  };
+  }
   free(block_buf);
   return 0;
 }
