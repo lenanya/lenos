@@ -67,10 +67,10 @@ void kernel_main() {
         print(" ");
         println(fb.items);
       }
+      free(fb.items);
     } else if (strcmp(cmd.items, "ls") == true) {
       dir.size = 0;
       lfs_read_directory(&dir);
-      printf("%p\n", dir);
 
       for (int i = 0; i < dir.size; ++i) {
         printf(" %s   %dB\n", dir.items[i]->name, dir.items[i]->file_size);
@@ -88,6 +88,7 @@ void kernel_main() {
         da_append(&fb, args[i]);
       }
       write_entire_file(&fb, name);
+      free(fb.items);
     } else if (strcmp(cmd.items, "dump") == true) {
       heap_dump();
     } else {

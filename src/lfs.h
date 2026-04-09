@@ -38,7 +38,7 @@ typedef struct LFS_Table_Entry {
   bool deleted;          // 1
   bool last;             // 1
   u32 file_first_lba;   // 4
-  char reserved[64-4-4-1-1-4-1-32];
+  char reserved[64-4-1-1-4-1-32];
 } __attribute__((packed)) LFS_Table_Entry;
 
 typedef struct {
@@ -68,5 +68,6 @@ LFS_Superblock* lfs_get_superblock(void);
 void lfs_append_table(LFS_Table_Entry* te);
 u32 lfs_find_second_free();
 void lfs_write_superblock(LFS_Superblock* sb);
+void print_table_entry(LFS_Table_Entry* te);
 
 #endif // LFS_H

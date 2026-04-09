@@ -63,6 +63,10 @@ void vga_print_char_colour(u8 c, u8 colour) {
   __vga_current_x++;
   if (__vga_current_x >= VGA_COLS) {
     __vga_current_y++;
+    if (__vga_current_y == VGA_ROWS) {
+      vga_scroll(D_UP, colour);
+      __vga_current_y--;
+    } 
     __vga_current_x = 0;
   }
   vga_set_cursor_position(__vga_current_x, __vga_current_y);

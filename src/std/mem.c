@@ -8,7 +8,7 @@ void* __HEAP_TOP = NULL;
 
 void memncpy(void* src, void* dest, u32 n) {
 	for (u32 i = 0; i < n; ++i) {
-		((char*)dest)[i] = ((char*)src)[i];
+		((addr)dest)[i] = ((addr)src)[i];
 	}
 }
 
@@ -65,7 +65,7 @@ void mem_setup_heap_vars(void) {
 	largest_start += (32 - largest_start % 32);
 
 	__HEAP_BASE = (void*)(u32)largest_start;
-	__HEAP_TOP  = (void*)(u32)largest_start + largest_size;
+	__HEAP_TOP  = (void*)(u32)(largest_start + largest_size);
 }
 
 void* malloc(u32 size) {
@@ -74,7 +74,10 @@ void* malloc(u32 size) {
 	}
 	if (__HEAP_BASE == NULL) {
 		mem_setup_heap_vars();
-		if ((u32)__HEAP_BASE + size > (u32)__HEAP_TOP) return NULL;
+		if ((u32)__HEAP_BASE + size > (u32)__HEAP_TOP) {
+			eprintln("malloc returning null");
+			return NULL;
+		}
 		u32 alloc_size = sizeof(Mem_Header) + size;
 		*((Mem_Header*)__HEAP_BASE) = (Mem_Header) {
 			.size = size,
@@ -97,35 +100,42 @@ void* malloc(u32 size) {
 		if (header->is_free) {
 			if (header->size >= size) {
 				u32 extra_size = 0;
-				if (!(header->size == size)) {
-					Mem_Header* next = (Mem_Header*)((addr)header + sizeof(Mem_Header) + size);
+				if (header->size != size) {
+					Mem_Header* org_next = header->next;
+					Mem_Header* split = (Mem_Header*)((addr)header + sizeof(Mem_Header) + size);
 					if (header->size - size < sizeof(Mem_Header) + 1) {
-						extra_size = header->size - size;
+						header->is_free = false;
+						return (addr)header + sizeof(Mem_Header);
 					} else {
-						*next = (Mem_Header) {
+						*split = (Mem_Header) {
 							.size = header->size - sizeof(Mem_Header) - size,
 							.is_free = true,
-							.next = header->next,
+							.next = org_next,
 							.prev = header,
 						};
+						if (org_next) org_next->prev = split;
+						header->next = split;
 					}
+
 					header->is_free = false;
 					header->size = size + extra_size;
-					if (next) {
-						header->next = next;
-					} else {
-						header->next = NULL;
-					}
+					return (addr)header + sizeof(Mem_Header);
+				} else {
+					header->is_free = false;
 					return (addr)header + sizeof(Mem_Header);
 				}
-				header->is_free = false;
-				return (addr)header + sizeof(Mem_Header); 
 			} else {
-				if (!header->next) return NULL;
+				if (!header->next) {
+					eprintln("malloc returning null");
+					return NULL;
+				}
 				header = header->next; 
 			}
  		} else {
-			if (!header->next) return NULL;
+			if (!header->next) {
+				eprintln("malloc returning null");
+				return NULL;
+			}
 			header = header->next;
 		}
 	}
@@ -134,15 +144,15 @@ void* malloc(u32 size) {
 void free(void* mem) {
 	if (!mem) return;
 	Mem_Header* header = (Mem_Header*)((addr)mem - sizeof(Mem_Header));
+	if (header->is_free) return;
 	header->is_free = true;
 	header->owner = NULL;
-	if (header->next == NULL) return;
+	
 	while (header->next != NULL && header->next->is_free) {
 		header->size += header->next->size + sizeof(Mem_Header);
 		header->next = header->next->next;
+		if (header->next) header->next->prev = header;
 	}
-
-	if (header->next) header->next->prev = header;
 
 	while (header->prev != NULL && header->prev->is_free) {
 		header->prev->size += header->size + sizeof(Mem_Header);
@@ -156,9 +166,6 @@ void free(void* mem) {
 
 void* realloc(void* mem, u32 new_size) {
 	if (!mem) return malloc(new_size);
-	// freeing early is fine here since theres no way for that memory
-	// to change after this
-	free(mem);
 	if (new_size % 32 != 0) {
 		new_size += (32 - new_size % 32);
 	}
@@ -168,6 +175,7 @@ void* realloc(void* mem, u32 new_size) {
 	void* new = malloc(new_size);
 	give_allocation_name(new, header->owner);
 	memncpy(mem, new, size);
+	free(mem);
 	return new;
 }
 

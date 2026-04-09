@@ -8,6 +8,22 @@
 
 LFS_Superblock* sb = NULL;
 
+
+void print_table_entry(LFS_Table_Entry* te) {
+  //  char name[32];         // 32  
+  //  LFS_Entry_Flags flags; // 1
+  //  u32 file_size;        // 4
+  //  bool deleted;          // 1
+  //  bool last;             // 1
+  //  u32 file_first_lba;   // 4
+  printf("          name: %s\n", te->name);
+  printf("         flags: %c\n", te->flags);
+  printf("     file_size: %u\n", te->file_size);
+  printf("       deleted: %b\n", te->deleted);
+  printf("          last: %b\n", te->last);
+  printf("file_first_lba: %u\n\n", te->file_first_lba);
+}
+
 LFS_Superblock* lfs_get_superblock(void) {
   u16* block_buf = (u16*)malloc(512);
   give_allocation_name(block_buf, "lfs_get_superblock");
@@ -164,16 +180,13 @@ void lfs_read_directory(Directory* dir) {
   LFS_Superblock* sb_local = lfs_get_superblock();
   if (sb_local == NULL) return;
   if (sb_local->entry_count < 1) return;
-  for (u32 i = 0; i < dir->size; ++i) {
-    free(dir->items[i]);
-  }
   dir->size = 0;
   LFS_Table_Entry* te = NULL;
   u32 block = 1;
   u16* block_buf = (u16*)calloc(512, 0);
   give_allocation_name(block_buf, "lfs_read_directory");
   te = (LFS_Table_Entry*)block_buf;
-  while (!te->last) {
+  do {
     if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
     ata_read_sectors(sb_local->superblock_lba + block, 1, block_buf);
     te = (LFS_Table_Entry*)block_buf;
@@ -189,7 +202,7 @@ void lfs_read_directory(Directory* dir) {
       }
     }
     block++;
-  };
+  } while (!te->last);
   free(block_buf);
 } 
 

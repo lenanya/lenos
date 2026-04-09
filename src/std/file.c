@@ -4,8 +4,10 @@
 #include "da.h"
 #include "../vga.h"
 #include "string.h"
+#include "io.h"
 
 void read_entire_file(File_Buffer* fb, char* filename) {
+  fb->size = 0;
   LFS_Table_Entry* te = lfs_find_file(filename);
   if (!te) {  
     fb->exists = false;
@@ -15,7 +17,6 @@ void read_entire_file(File_Buffer* fb, char* filename) {
   }
 
   u16* block_buf = (u16*)malloc(512);
-  give_allocation_name(block_buf, "read_entire_file");
   u32 lba = te->file_first_lba;
   while (lba != 0) {
     ata_read_sectors(lba, 1, block_buf);
@@ -41,7 +42,7 @@ void write_entire_file(File_Buffer* fb, char* filename) {
   ent->flags = 0;
   ent->last = 1;
 
-  for (int i = 0; i < strlen(filename); ++i) {
+  for (int i = 0; i < strlen(filename) && i < 32; ++i) {
     ent->name[i] = filename[i];
   }
 

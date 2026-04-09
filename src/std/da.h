@@ -5,6 +5,7 @@
 #define DA_INITIAL_SIZE 32
 
 #define da_append(da, x) do {                                     \
+  (da)->size++;                                                   \
   if ((da)->capacity == 0) {                                      \
     (da)->capacity = DA_INITIAL_SIZE;                             \
     (da)->items = malloc((da)->capacity);                         \
@@ -14,7 +15,7 @@
     (da)->capacity = (da)->capacity * 2;                          \
     (da)->items = realloc((da)->items, (da)->capacity);           \
   }                                                               \
-  (da)->items[(da)->size++] = x;                                  \
+  (da)->items[(da)->size-1] = x;                                  \
 } while(0);
 
 #define da_free(da) free((da)->items)
