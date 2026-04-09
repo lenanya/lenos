@@ -2,6 +2,7 @@
 #include "stdarg.h"
 #include "string.h"
 #include "mem.h"
+#include "../kernel/vga.h"
 
 void println(char* s) {
   vga_print_string(s);

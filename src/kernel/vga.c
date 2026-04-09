@@ -1,7 +1,7 @@
-#include "common.h"
+#include "../common.h"
 #include "vga.h"
-#include "std/string.h"
-#include "std/mem.h"
+#include "../std/string.h"
+#include "../std/mem.h"
 
 static int __vga_current_x = 0;
 static int __vga_current_y = 0;

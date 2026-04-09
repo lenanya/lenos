@@ -1,10 +1,10 @@
 #include "lfs.h"
-#include "std/da.h"
+#include "../std/da.h"
 #include "ata.h"
-#include "std/string.h"
+#include "../std/string.h"
 #include "vga.h"
-#include "std/file.h"
-#include "std/io.h"
+#include "../std/file.h"
+#include "../std/io.h"
 
 LFS_Superblock* sb = NULL;
 

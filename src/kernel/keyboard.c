@@ -1,5 +1,5 @@
 #include "keyboard.h"
-#include "common.h"
+#include "../common.h"
 
 bool kb_is_make(u8 scancode) {
   return (scancode & 0x80) == 0;

@@ -1,7 +1,7 @@
 #include "ata.h"
-#include "common.h"
-#include "std/da.h"
-#include "std/io.h"
+#include "../common.h"
+#include "../std/da.h"
+#include "../std/io.h"
 
 void ata_wait_for_ready(void) {
   // while busy

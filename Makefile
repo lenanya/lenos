@@ -17,8 +17,8 @@ build/kernel.o: src/kernel.c src/std/da.h
 build/common.o: src/common.c src/common.h
 	cc $(CFLAGS) src/common.c -o build/common.o
 
-build/vga.o: src/vga.c src/vga.h
-	cc $(CFLAGS) src/vga.c -o build/vga.o
+build/kernel/vga.o: src/kernel/vga.c src/kernel/vga.h
+	cc $(CFLAGS) src/kernel/vga.c -o build/kernel/vga.o
 	
 build/string.o: src/std/string.c src/std/string.h
 	cc $(CFLAGS) src/std/string.c -o build/string.o
@@ -26,11 +26,11 @@ build/string.o: src/std/string.c src/std/string.h
 build/mem.o: src/std/mem.c src/std/mem.h
 	cc $(CFLAGS) src/std/mem.c -o build/mem.o
 
-build/keyboard.o: src/keyboard.c src/keyboard.h
-	cc $(CFLAGS) src/keyboard.c -o build/keyboard.o
+build/keyboard.o: src/kernel/keyboard.c src/kernel/keyboard.h
+	cc $(CFLAGS) src/kernel/keyboard.c -o build/keyboard.o
 
-build/ata.o: src/ata.c src/ata.h
-	cc $(CFLAGS) src/ata.c -o build/ata.o
+build/ata.o: src/kernel/ata.c src/kernel/ata.h
+	cc $(CFLAGS) src/kernel/ata.c -o build/ata.o
 
 build/file.o: src/std/file.c src/std/file.h
 	cc $(CFLAGS) src/std/file.c -o build/file.o
@@ -38,8 +38,8 @@ build/file.o: src/std/file.c src/std/file.h
 build/io.o: src/std/io.c src/std/io.h
 	cc $(CFLAGS) src/std/io.c -o build/io.o
 
-build/lfs.o: src/lfs.c src/lfs.h
-	cc $(CFLAGS) src/lfs.c -o build/lfs.o
+build/lfs.o: src/kernel/lfs.c src/kernel/lfs.h
+	cc $(CFLAGS) src/kernel/lfs.c -o build/lfs.o
 
 clean:
 	rm build/*

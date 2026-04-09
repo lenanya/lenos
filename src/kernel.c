@@ -1,7 +1,8 @@
 #include "common.h"
-#include "vga.h"
-#include "keyboard.h"
-#include "lfs.h"
+
+#include "kernel/vga.h"
+#include "kernel/keyboard.h"
+#include "kernel/lfs.h"
 
 #include "std/mem.h"
 #include "std/string.h"
@@ -100,6 +101,9 @@ void kernel_main() {
       }
       write_entire_file(&fb, "test3.txt");
       free(fb.items);
+    } else if (strcmp(cmd.items, "reboot")) {
+      // this reboots computer for some reason :3
+      outb(KB_CTRL, 0xFE);
     } else {
       eprint(" ERROR: Unknown command: ");
       eprintln(cmd.items);

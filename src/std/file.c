@@ -1,8 +1,8 @@
 #include "file.h"
-#include "../lfs.h"
-#include "../ata.h"
+#include "../kernel/lfs.h"
+#include "../kernel/ata.h"
 #include "da.h"
-#include "../vga.h"
+#include "../kernel/vga.h"
 #include "string.h"
 #include "io.h"
 

@@ -1,7 +1,7 @@
 #ifndef VGA_H
 #define VGA_H
 
-#include "common.h"
+#include "../common.h"
 
 #define VGA_MEM          0xb8000
 #define VGA_INDEX        0x3d4

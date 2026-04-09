@@ -1,6 +1,6 @@
 #ifndef ATA_H
 #define ATA_H
-#include "common.h"
+#include "../common.h"
 
 #define ATA_CMD_STAT   0x1F7
 #define ATA_DATA       0x1F0

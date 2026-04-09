@@ -1,6 +1,6 @@
 #ifndef LFS_H
 #define LFS_H
-#include "common.h"
+#include "../common.h"
 
 typedef u8 LFS_Entry_Flags;
 typedef struct LFS_Superblock LFS_Superblock;

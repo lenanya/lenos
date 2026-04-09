@@ -2,7 +2,6 @@
 #define IO_H
 
 #include "../common.h"
-#include "../vga.h"
 
 void println(char* s);
 void print(char* s);

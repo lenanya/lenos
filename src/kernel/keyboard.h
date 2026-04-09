@@ -1,6 +1,6 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
-#include "common.h"
+#include "../common.h"
 
 #define KB_DATA   0x60
 #define KB_CTRL   0x64

@@ -1,5 +1,5 @@
 #include "mem.h"
-#include "../vga.h"
+#include "../kernel/vga.h"
 #include "string.h"
 #include "io.h"
 
