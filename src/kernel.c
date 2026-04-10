@@ -4,17 +4,36 @@
 #include "kernel/keyboard.h"
 #include "kernel/lfs.h"
 
+#include "std.h"
+
 #include "std/mem.h"
 #include "std/string.h"
 #include "std/da.h"
 #include "std/file.h"
 #include "std/io.h"
 
+#include "program_contents.h"
+
+#define PROGRAM_ADDR (addr)0x90000
+
 void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
   vga_flip_buffer();
   String_Buffer cmd = {0};
   Directory dir = {0};
+  i32 ret_code = 0;
+
+
+  LFS_Table_Entry* te = lfs_find_file(cmd.items);
+  if (!te) {
+    File_Buffer fb = {0};
+    for (u32 i = 0; i < sizeof(program_contents); ++i) {
+      da_append(&fb, program_contents[i]);
+    }
+    write_entire_file(&fb, "prog.x");
+    free(fb.items);
+  }
+  free(te);
 
   for (;;) {
     cmd.size = 0;
@@ -49,8 +68,11 @@ void kernel_main() {
     }
     if (strcmp(cmd.items, "echo") == true) {
       print(" ");
-      if (args[0]) println(args);
-      else println("");
+      if (strcmp(args, "//") == true) {
+        printf("%d\n", ret_code);
+      } else if (args[0]) {
+         println(args);
+      } else println("");
     } else if (strcmp(cmd.items, "cat") == true) {
       if (!args[0]) {
         eprintln(" ERROR: No file specified");
@@ -105,8 +127,23 @@ void kernel_main() {
       // this reboots computer for some reason :3
       outb(KB_CTRL, 0xFE);
     } else {
-      eprint(" ERROR: Unknown command: ");
-      eprintln(cmd.items);
+      LFS_Table_Entry* te = lfs_find_file(cmd.items);
+      if (!te) {
+        eprint(" ERROR: Unknown command: ");
+        eprintln(cmd.items);
+        free(te);
+        continue;
+      }
+      free(te);
+      File_Buffer fb = {0};
+      read_entire_file(&fb, cmd.items);
+      memncpy(fb.items, (addr)PROGRAM_ADDR, fb.size);
+      free(fb.items);
+      i32(*main)(Std std) = (i32(*)(Std))PROGRAM_ADDR;
+      Std std = {0};
+      init_std(&std);
+      ret_code = main(std);
+      free_user_allocations();
     }
     for (u32 i = 0; i < dir.size; ++i) {
       free(dir.items[i]);

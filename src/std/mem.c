@@ -2,9 +2,12 @@
 #include "../kernel/vga.h"
 #include "string.h"
 #include "io.h"
+#include "da.h"
 
 void* __HEAP_BASE = NULL;
 void* __HEAP_TOP = NULL;
+
+Mem_Allocs* user_allocs = NULL;
 
 void memncpy(void* src, void* dest, u32 n) {
 	for (u32 i = 0; i < n; ++i) {
@@ -66,6 +69,24 @@ void mem_setup_heap_vars(void) {
 
 	__HEAP_BASE = (void*)(u32)largest_start;
 	__HEAP_TOP  = (void*)(u32)(largest_start + largest_size);
+}
+
+void* user_malloc(u32 size) {
+	//eprintln("user_malloc");
+	void* mem = malloc(size);
+	if (!user_allocs) user_allocs = calloc(sizeof(Mem_Allocs), 0);
+	da_append(user_allocs, mem);
+	return mem;
+}
+
+void free_user_allocations() {
+	if (!user_allocs) return;
+	for (u32 i = 0; i < user_allocs->size; ++i) {
+		//eprintln("freeing user allocation");
+		free(user_allocs->items[i]);
+	}
+	free(user_allocs);
+	user_allocs = NULL;
 }
 
 void* malloc(u32 size) {
