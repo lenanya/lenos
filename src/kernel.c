@@ -123,9 +123,15 @@ void kernel_main() {
       }
       write_entire_file(&fb, "test3.txt");
       free(fb.items);
-    } else if (strcmp(cmd.items, "reboot")) {
+    } else if (strcmp(cmd.items, "reboot") == true) {
       // this reboots computer for some reason :3
       outb(KB_CTRL, 0xFE);
+    } else if (strcmp(cmd.items, "rm") == true) {
+      if (!args[0]) {
+        eprintln("ERROR: No file specified");
+        continue;
+      }
+      lfs_delete_file(args);
     } else {
       LFS_Table_Entry* te = lfs_find_file(cmd.items);
       if (!te) {

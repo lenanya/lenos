@@ -31,23 +31,24 @@ void read_entire_file(File_Buffer* fb, char* filename) {
 }
 
 void write_entire_file(File_Buffer* fb, char* filename) {
+  LFS_Table_Entry* te = lfs_find_file(filename);
+  if (te) {
+    lfs_delete_file(filename);
+  } 
   u32 file = lfs_find_first_free();
   if (!file) return;
-  u32 table = lfs_find_first_free_table_block();
-  if (!table) return;
+  LFS_Table_Position tp = lfs_find_first_free_table_block();
+  if (!tp.lba) return;
   LFS_Table_Entry* ent = calloc(sizeof(LFS_Table_Entry), 0);
   ent->deleted = false;
   ent->file_size = fb->size;
   ent->flags = 0;
-  ent->last = 1;
 
   for (u32 i = 0; i < strlen(filename) && i < 32; ++i) {
     ent->name[i] = filename[i];
   }
 
   LFS_File_Block* fbl = malloc(sizeof(LFS_File_Block));
-
-
   if (fb->size <= 507) {
     fbl->flags = BLOCK_USED;
     fbl->next_block_lba = 0;
