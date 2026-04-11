@@ -269,7 +269,6 @@ void lfs_delete_file(char* filename) {
     for (u32 i = 0; i < 256; ++i) {
       block_buf[i] = 0;
     } 
-    printf("writing 0s to %u\n", lba2);
     ata_write_sector(lba2, block_buf);
   }
   free(block_buf);
