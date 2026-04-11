@@ -13,13 +13,13 @@ build/lenos.bin: src/lenos.asm build/kernel.bin
 build/prog.bin: build/prog.o 
 	ld -m elf_i386 -T src/prog.ld -Ttext 0x90000 build/prog.o -o build/prog.bin --oformat binary
 
-build/kernel.bin: $(OFILES) src/kernel.ld src/program_content.h
+build/kernel.bin: $(OFILES) src/kernel.ld src/program_contents.h
 	ld -m elf_i386 -T src/kernel.ld -Ttext 0x9000 $(OFILES) -o build/kernel.bin --oformat binary
 
-src/program_content.h: build/prog.bin
-	python binary_to_h.py
+src/program_contents.h: build/prog.bin
+	python binary_to_h.py build/prog.bin src/program_contents.h
 
-build/kernel.o: src/kernel.c src/std/da.h src/program_content.h
+build/kernel.o: src/kernel.c src/std/da.h src/program_contents.h
 	cc $(CFLAGS) src/kernel.c -o build/kernel.o
 
 build/common.o: src/common.c src/common.h
