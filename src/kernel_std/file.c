@@ -89,6 +89,10 @@ void write_entire_file(File_Buffer* fb, char* filename) {
   free(ent);
 }
 
+void delete_file(char* filename) {
+  lfs_delete_file(filename);
+}
+
 void file_buffer_free(File_Buffer* fb) {
   free(fb->items);
 }

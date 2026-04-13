@@ -6,8 +6,9 @@
 #include "kernel/lfs.h"
 #include "kernel/vga.h"
 
-#include "std/io.h"
-#include "std/mem.h"
+#include "kernel_std/io.h"
+#include "kernel_std/mem.h"
+#include "kernel_std/file.h"
 
 void init_std(Std* std) {
   std->io = (Std_Io) {
@@ -23,5 +24,11 @@ void init_std(Std* std) {
     .memdup = memdup,
     .memncpy = memncpy,
     .realloc = realloc,
+  };
+  std->file = (Std_File) {
+    .file_buffer_free = file_buffer_free,
+    .read_entire_file = read_entire_file,
+    .write_entire_file = write_entire_file,
+    .delete_file = delete_file,
   };
 }

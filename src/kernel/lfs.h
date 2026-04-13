@@ -52,7 +52,7 @@ typedef struct {
   u32 size;
   u32 capacity;
   bool exists;
-} __attribute__((packed)) LFS_File;
+} LFS_File;
 
 typedef struct Directory {
   LFS_Table_Entry** items;

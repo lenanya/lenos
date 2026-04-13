@@ -15,6 +15,17 @@ typedef long long i64;
 typedef unsigned long long u64;
 typedef u8* addr;
 
+typedef struct File_Buffer {
+  char* items;
+  u32 size;
+  u32 capacity;
+  bool exists;
+} File_Buffer;
+
+typedef enum {
+  FILE,
+} File_Type;
+
 void outb(u16 port, u8 val);
 u8 inb(u16 port);
 u16 inw(u16 port);

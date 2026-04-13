@@ -7,7 +7,7 @@ typedef struct {
   char* items;
   u32 size;
   u32 capacity;
-} __attribute__((packed)) String_Buffer;
+} String_Buffer;
 
 int strlen(char* s);
 char* strdup(char* s);

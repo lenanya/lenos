@@ -6,15 +6,18 @@
 
 #include "std.h"
 
-#include "std/mem.h"
-#include "std/string.h"
-#include "std/da.h"
-#include "std/file.h"
-#include "std/io.h"
+#include "kernel_std/mem.h"
+#include "kernel_std/string.h"
+#include "kernel_std/da.h"
+#include "kernel_std/file.h"
+#include "kernel_std/io.h"
 
-#include "program_contents.h"
+#include "progs/helloworld_contents.h"
+#include "progs/edit_contents.h"
 
 #define PROGRAM_ADDR (addr)0x90000
+
+void add_prog(u8* data, u32 size, char* filename);
 
 void kernel_main() {
   vga_clear_screen(VGA_CYAN_ON_GREY);
@@ -23,17 +26,8 @@ void kernel_main() {
   Directory dir = {0};
   i32 ret_code = 0;
 
-
-  LFS_Table_Entry* te = lfs_find_file(cmd.items);
-  if (!te) {
-    File_Buffer fb = {0};
-    for (u32 i = 0; i < sizeof(program_contents); ++i) {
-      da_append(&fb, program_contents[i]);
-    }
-    write_entire_file(&fb, "prog.x");
-    free(fb.items);
-  }
-  free(te);
+  add_prog(helloworld_contents, helloworld_length, "hw.x");
+  add_prog(edit_contents, edit_length, "edit");
 
   for (;;) {
     cmd.size = 0;
@@ -145,14 +139,38 @@ void kernel_main() {
       read_entire_file(&fb, cmd.items);
       memncpy(fb.items, (addr)PROGRAM_ADDR, fb.size);
       free(fb.items);
-      i32(*main)(Std std) = (i32(*)(Std))PROGRAM_ADDR;
+      i32(*main)(Std std, Args args) = (i32(*)(Std, Args))PROGRAM_ADDR;
       Std std = {0};
       init_std(&std);
-      ret_code = main(std);
+      Args user_args = {0};
+      while (args[0] != 0) {
+        da_append(&user_args, args);
+        while (args[0] != ' ' && args[0] != 0) {
+          args++;
+        }
+        if (args[0] == ' ') {
+          args[0] = 0;
+          args++;
+        }
+      }
+      ret_code = main(std, user_args);
       free_user_allocations();
     }
     for (u32 i = 0; i < dir.size; ++i) {
       free(dir.items[i]);
     }
   }
+}
+
+void add_prog(u8* data, u32 size, char* filename) {
+  LFS_Table_Entry* te = lfs_find_file(filename);
+  if (!te) {
+    File_Buffer fb = {0};
+    for (u32 i = 0; i < size; ++i) {
+      da_append(&fb, data[i]);
+    }
+    write_entire_file(&fb, filename);
+    free(fb.items);
+  }
+  free(te);
 }
