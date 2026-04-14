@@ -9,5 +9,6 @@ void putc(char c);
 void eprint(char* s);
 void eprintln(char* s);
 void printf(char* fmt, ...);
+char getc();
 
 #endif // IO_H

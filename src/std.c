@@ -9,6 +9,7 @@
 #include "kernel_std/io.h"
 #include "kernel_std/mem.h"
 #include "kernel_std/file.h"
+#include "kernel_std/string.h"
 
 void init_std(Std* std) {
   std->io = (Std_Io) {
@@ -16,6 +17,7 @@ void init_std(Std* std) {
     .print = print,
     .println = println,
     .putc = putc,
+    .getc = getc,
   };
   std->mem = (Std_Mem) {
     .calloc = calloc,
@@ -30,5 +32,13 @@ void init_std(Std* std) {
     .read_entire_file = read_entire_file,
     .write_entire_file = write_entire_file,
     .delete_file = delete_file,
+    .get_file_entry = lfs_find_file,
+  };
+  std->str = (Std_String) {
+    .utoa = utoa,
+    .strlen = strlen,
+    .stou32 = stou32,
+    .is_digit = is_digit,
+    .s_is_digits = s_is_digits,
   };
 }

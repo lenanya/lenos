@@ -3,6 +3,7 @@
 #include "string.h"
 #include "mem.h"
 #include "../kernel/vga.h"
+#include "../kernel/keyboard.h"
 
 void println(char* s) {
   vga_print_string(s);
@@ -102,4 +103,24 @@ void printf(char* fmt, ...) {
   }
   va_end(args);
   vga_flip_buffer();
+}
+
+char getc() {
+  u8 sc = 0;
+  bool shift = false;
+  for (;;) {
+    sc = kb_get_scancode();
+    if (!kb_is_make(sc)) {
+      if (sc == 42) shift = false;
+      continue;
+    }
+    if (sc == 42) shift = true;
+    u8 ascii;
+    if (shift) {
+      ascii = kb_gb_shift_map[sc];
+    } else {
+      ascii = kb_gb_map[sc];
+    }
+    if (ascii) return ascii;
+  }
 }

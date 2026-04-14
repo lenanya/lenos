@@ -13,6 +13,7 @@ typedef struct Std_Io {
   void(*println)(char* s);
   void(*putc)   (char c);
   void(*printf) (char* fmt, ...);
+  char(*getc)   (void);
 } Std_Io;
 
 typedef struct Std_Mem {
@@ -29,12 +30,22 @@ typedef struct Std_File {
   void (*file_buffer_free)(File_Buffer* fb);
   void (*write_entire_file)(File_Buffer* fb, char* filename);
   void (*delete_file)(char* filename);
+  LFS_Table_Entry* (*get_file_entry)(char* filename);
 } Std_File;
+
+typedef struct Std_String {
+  char* (*utoa)(u32 n);
+  u32   (*strlen)(char* s);
+  u32   (*stou32)(char* s);
+  bool  (*is_digit)(char c);
+  bool  (*s_is_digits)(char* s);
+} Std_String;
 
 typedef struct Std {
   Std_Io io;
   Std_Mem mem;
   Std_File file;
+  Std_String str;
 } Std;
 
 void init_std(Std* std);

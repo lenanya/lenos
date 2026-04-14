@@ -202,7 +202,7 @@ void* realloc(void* mem, u32 new_size) {
 
 void* calloc(u32 size, char b) {
 	void* mem = malloc(size);
-	for (int i = 0; i < size; ++i) {
+	for (u32 i = 0; i < size; ++i) {
 		((char*)mem)[i] = b;
 	}
 	return mem;

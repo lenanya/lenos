@@ -89,7 +89,7 @@ void kernel_main() {
       dir.size = 0;
       lfs_read_directory(&dir);
 
-      for (int i = 0; i < dir.size; ++i) {
+      for (u32 i = 0; i < dir.size; ++i) {
         printf(" %s   %dB\n", dir.items[i]->name, dir.items[i]->file_size);
       }
     } else if (strcmp(cmd.items, "clear") == true) {
@@ -101,7 +101,7 @@ void kernel_main() {
       args[0] = 0;
       args++;
       File_Buffer fb = {0};
-      for (int i = 0; i < strlen(args); ++i) {
+      for (u32 i = 0; i < strlen(args); ++i) {
         da_append(&fb, args[i]);
       }
       write_entire_file(&fb, name);
@@ -155,6 +155,7 @@ void kernel_main() {
       }
       ret_code = main(std, user_args);
       free_user_allocations();
+      free(user_args.items);
     }
     for (u32 i = 0; i < dir.size; ++i) {
       free(dir.items[i]);

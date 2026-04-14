@@ -2,7 +2,7 @@ all: build/lenos.bin
 
 CFLAGS = -m32 -ffreestanding -fno-pie -nostdlib -Wall -Wno-unused-variable -c \
 				 -Wno-unused-value -fno-stack-protector -mno-sse -mno-sse2 -mno-mmx   \
-				 -mpreferred-stack-boundary=2
+				 -mpreferred-stack-boundary=2 -O0 -Wextra -Wno-unused-parameter
 OFILES = build/kernel.o build/common.o build/vga.o build/string.o \
 				 build/keyboard.o build/mem.o build/ata.o build/file.o build/lfs.o \
 				 build/io.o build/std.o

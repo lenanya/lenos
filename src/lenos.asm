@@ -325,7 +325,7 @@ raw_first_lba = sector_count + sector_count_c + 4
 
 db 1
 dd 0 ; next lba
-filedat: db "HELLO FROM A FILE!!!!!!!", 10, 0
+filedat: db "HELLO FROM A FILE!!!!!!!", 10, "line 2", 10
 
 raw_end:
 times 512 - (raw_end - raw_start) db 0

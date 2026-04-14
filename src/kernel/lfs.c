@@ -48,8 +48,8 @@ LFS_Superblock* lfs_get_superblock(void) {
   return NULL;
 }
 
-void lfs_write_superblock(LFS_Superblock* sb) {
-  ata_write_sector(sb->superblock_lba, (u16*)sb);
+void lfs_write_superblock(LFS_Superblock* sb_local) {
+  ata_write_sector(sb->superblock_lba, (u16*)sb_local);
 }
 
 void lfs_append_table(LFS_Table_Entry* te) {
@@ -155,12 +155,12 @@ u32 lfs_find_second_free() {
 }
 
 LFS_Table_Position lfs_find_first_free_table_block() {
-  LFS_Superblock* sb = lfs_get_superblock();
+  LFS_Superblock* sb_local = lfs_get_superblock();
   u8* block_buf = (u8*)malloc(512);
   u32 block = 1;
 
   while (block < LFS_MAX_BLOCKS) {
-    u32 current_lba = sb->superblock_lba + block;
+    u32 current_lba = sb_local->superblock_lba + block;
     ata_read_sectors(current_lba, 1, (u16*)block_buf);
     LFS_Table_Entry* entries = (LFS_Table_Entry*)block_buf;
     
