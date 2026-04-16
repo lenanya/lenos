@@ -297,7 +297,7 @@ table_start:
 db "test.txt" ; filename
 times 32 - 8 db 0
 db 0 ; filetype = FILE
-dd 26 ; size 
+dd 32 ; size 
 db 0 ; deleted = false
 db 0 ; last = no
 dd raw_first_lba ; lba of first

@@ -23,6 +23,7 @@ typedef struct Std_Mem {
   void*(*realloc) (void* mem, u32 new_size);
   void*(*calloc)  (u32 size, char b);
   void*(*memdup)  (void* mem, u32 size);
+  void (*heap_dump)(void);
 } Std_Mem;
 
 typedef struct Std_File {
@@ -39,6 +40,7 @@ typedef struct Std_String {
   u32   (*stou32)(char* s);
   bool  (*is_digit)(char c);
   bool  (*s_is_digits)(char* s);
+  bool  (*strcmp)(char* a, char* b);
 } Std_String;
 
 typedef struct Std {

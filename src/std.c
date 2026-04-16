@@ -26,6 +26,7 @@ void init_std(Std* std) {
     .memdup = memdup,
     .memncpy = memncpy,
     .realloc = realloc,
+    .heap_dump = heap_dump,
   };
   std->file = (Std_File) {
     .file_buffer_free = file_buffer_free,
@@ -40,5 +41,6 @@ void init_std(Std* std) {
     .stou32 = stou32,
     .is_digit = is_digit,
     .s_is_digits = s_is_digits,
+    .strcmp = strcmp,
   };
 }
