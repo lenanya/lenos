@@ -7,11 +7,11 @@
   (da)->size++;                                                   \
   if ((da)->capacity == 0) {                                      \
     (da)->capacity = DA_INITIAL_SIZE;                             \
-    (da)->items = std.mem.malloc((da)->capacity);                         \
+    (da)->items = std.mem.malloc((da)->capacity * sizeof((da)->items[0]));                         \
   }                                                               \
   if ((da)->size > (da)->capacity) {                              \
     (da)->capacity = (da)->capacity * 2;                          \
-    (da)->items = std.mem.realloc((da)->items, (da)->capacity);           \
+    (da)->items = std.mem.realloc((da)->items, (da)->capacity * sizeof((da)->items[0]));           \
   }                                                               \
   (da)->items[(da)->size-1] = x;                                  \
 } while(0);

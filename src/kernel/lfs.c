@@ -251,10 +251,12 @@ void lfs_delete_file(char* filename) {
     for (u32 i = 0; i < 8; ++i) {
       te2 = ((LFS_Table_Entry*)block_buf)+i;
       if (strcmp(filename, te2->name) == true) {
+        eprintln("yep found the file");
         te2->deleted = true;
         for (u32 j = 0; j < 32; ++j) {
           te2->name[j] = 0;
         }
+        printf("lba of te2 %u\n", sb_local->superblock_lba);
         ata_write_sector(sb_local->superblock_lba + block, block_buf);
         goto done;
       }

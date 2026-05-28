@@ -8,16 +8,16 @@
   (da)->size++;                                                   \
   if ((da)->capacity == 0) {                                      \
     (da)->capacity = DA_INITIAL_SIZE;                             \
-    (da)->items = malloc((da)->capacity);                         \
+    (da)->items = malloc((da)->capacity * sizeof((da)->items[0]));                         \
     give_allocation_name((da)->items, "da_append");               \
   }                                                               \
   if ((da)->size > (da)->capacity) {                              \
     (da)->capacity = (da)->capacity * 2;                          \
-    (da)->items = realloc((da)->items, (da)->capacity);           \
+    (da)->items = realloc((da)->items, (da)->capacity * sizeof((da)->items[0]));           \
   }                                                               \
   (da)->items[(da)->size-1] = x;                                  \
 } while(0);
 
-#define da_free(da) free((da)->items)
+#define da_free(da) free((da)->items);
 
 #endif // DA_H

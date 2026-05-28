@@ -14,16 +14,14 @@ typedef struct Line_Buffer {
 
 i32 main(Std s, Args args) {
   std = s;
-  Line_Buffer* lb = std.mem.malloc(sizeof(Line_Buffer));
-  if (!lb) return 20;
+  Line_Buffer* lb = std.mem.calloc(sizeof(Line_Buffer), 0);
   lb->capacity = 0;
   lb->size = 0;
   lb->items = NULL;
   char* filename = NULL;
 
   char c = 0;
-  String_Buffer* line = (String_Buffer*)std.mem.malloc(sizeof(String_Buffer));
-  if (!line) return 20;
+  String_Buffer* line = (String_Buffer*)std.mem.calloc(sizeof(String_Buffer), 0);
   for (;;) {
     while (c != '\n') {
       c = std.io.getc();
@@ -34,7 +32,7 @@ i32 main(Std s, Args args) {
         char* cmd  = line->items;
         char* rest = line->items;
         while (rest[0] != ' ' && rest[0] != 0) {
-          std.io.printf("%p\n", rest);
+          //std.io.printf("%p\n", rest);
           ++rest;
         }
         if (rest[0] == ' ') {
@@ -42,7 +40,7 @@ i32 main(Std s, Args args) {
           ++rest;
         }
 
-        std.io.printf("cmd: %p, rest: %p\n", cmd, rest);
+        //std.io.printf("cmd: %p, rest: %p\n", cmd, rest);
         //std.mem.heap_dump();
         //return 30;
 
@@ -51,7 +49,7 @@ i32 main(Std s, Args args) {
             if (std.str.s_is_digits(rest)) {
               u32 l = std.str.stou32(rest);
               if (l < lb->size) {
-                std.io.printf("%s\n", lb->items[l]->items);
+                std.io.printf("%u: %s", l, lb->items[l]->items);
               } else {
                 std.io.printf("p: Line %u doesn't exist\n", l);
               }
@@ -61,8 +59,7 @@ i32 main(Std s, Args args) {
           }
         } else if (std.str.strcmp(cmd, ":a") == true) {
           if (rest[0] != 0) {
-            String_Buffer* temp = (String_Buffer*)std.mem.malloc(sizeof(String_Buffer));
-            if (!temp) return 20;
+            String_Buffer* temp = (String_Buffer*)std.mem.calloc(sizeof(String_Buffer), 0);
             for (u32 i = 0; i < std.str.strlen(rest); ++i) {
               da_append(temp, rest[i]);
             }
