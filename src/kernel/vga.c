@@ -9,6 +9,8 @@ static int __vga_current_y = 0;
 static VGA_Row* screen_buf = (VGA_Row*)(0xb9000);
 static VGA_Row* vga_mem    = (VGA_Row*)VGA_MEM;
 
+
+// clear the console with the colour
 void vga_clear_screen(u8 colour) {
   __vga_current_x = 0;
   __vga_current_y = 0;
@@ -20,6 +22,7 @@ void vga_clear_screen(u8 colour) {
   }
 }
 
+// turn off the blinking cursor
 void vga_disable_cursor(void) {
   outb(VGA_INDEX, VGA_CURSOR_START);
   outb(VGA_DATA, 0x20);
@@ -97,6 +100,7 @@ void vga_print_string_colour(char* s, u8 colour) {
   }
 }
 
+// move the entire prerendered frame 
 void vga_flip_buffer(void) {
   vga_wait_for_vblank();
   for (int y = 0; y < VGA_ROWS; ++y) {

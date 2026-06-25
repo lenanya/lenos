@@ -10,6 +10,7 @@
 #include "kernel_std/mem.h"
 #include "kernel_std/file.h"
 #include "kernel_std/string.h"
+#include "kernel_std/serial.h"
 
 void init_std(Std* std) {
   std->io = (Std_Io) {
@@ -18,6 +19,7 @@ void init_std(Std* std) {
     .println = println,
     .putc = putc,
     .getc = getc,
+    .eprintln = eprintln,
   };
   std->mem = (Std_Mem) {
     .calloc = calloc,
@@ -42,5 +44,11 @@ void init_std(Std* std) {
     .is_digit = is_digit,
     .s_is_digits = s_is_digits,
     .strcmp = strcmp,
+  };
+  std->serial = (Std_Serial) {
+    .serial_putc = com1_putc,
+    .serial_print = serial_print,
+    .serial_println = serial_println,
+    .serial_printf = serial_printf,
   };
 }

@@ -14,6 +14,7 @@ typedef struct Std_Io {
   void(*putc)   (char c);
   void(*printf) (char* fmt, ...);
   char(*getc)   (void);
+  void(*eprintln)(char* s);
 } Std_Io;
 
 typedef struct Std_Mem {
@@ -43,11 +44,19 @@ typedef struct Std_String {
   bool  (*strcmp)(char* a, char* b);
 } Std_String;
 
+typedef struct Std_Serial {
+  void (*serial_putc)(char c);
+  void (*serial_print)(char* s);
+  void (*serial_println)(char* s);
+  void (*serial_printf)(char* fmt, ...);
+} Std_Serial;
+
 typedef struct Std {
   Std_Io io;
   Std_Mem mem;
   Std_File file;
   Std_String str;
+  Std_Serial serial;
 } Std;
 
 void init_std(Std* std);

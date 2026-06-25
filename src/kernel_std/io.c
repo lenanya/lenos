@@ -4,37 +4,44 @@
 #include "mem.h"
 #include "../kernel/vga.h"
 #include "../kernel/keyboard.h"
+#include "../kernel/com1.h"
 
+// print a string to the console and append a newline
 void println(char* s) {
   vga_print_string(s);
   vga_print_char(10);
   vga_flip_buffer();
 }
 
+// print a string to the console
 void print(char* s) {
   vga_print_string(s);
   vga_flip_buffer();
 }
 
+// print a string to the console and append a newline but in red
 void eprintln(char* s) {
   vga_print_string_colour(s, VGA_RED_ON_GREY);
   vga_print_char(10);
   vga_flip_buffer();
 }
 
+// print a string to the console but in red
 void eprint(char* s) {
   vga_print_string_colour(s, VGA_RED_ON_GREY);
   vga_flip_buffer();
 }
 
+// print a character to the console
 void putc(char c) {
   vga_print_char(c);
   vga_flip_buffer();
 }
 
+// print a formatted string to the console
+// TODO: port padding from serial
 void printf(char* fmt, ...) {
   va_list args; 
-  u32 total = 0;
   va_start(args, fmt);
 
   u32 l = strlen(fmt);
@@ -75,17 +82,20 @@ void printf(char* fmt, ...) {
           break;
         }
         case 'b': {
-          u8 arg = (u8)va_arg(args, i32);
-          if (arg) {
-            print("true");
-          } else {
-            print("false");
-          }
+          i32 arg = va_arg(args, i32);
+          print(arg ? "true" : "false");
           break;
         }
-        case 'p': {
+        case 'x': {
           void* arg = va_arg(args, void*);
-          char* temp = u32_to_hex((u32)arg);
+          char* temp = u32_to_hex((u32)arg, false);
+          print(temp);
+          free(temp);
+          break;
+        }
+        case 'X': {
+          void* arg = va_arg(args, void*);
+          char* temp = u32_to_hex((u32)arg, true);
           print(temp);
           free(temp);
           break;
@@ -105,6 +115,8 @@ void printf(char* fmt, ...) {
   vga_flip_buffer();
 }
 
+// get a character of user input
+// TODO: handle properly
 char getc() {
   u8 sc = 0;
   bool shift = false;

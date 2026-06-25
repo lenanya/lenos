@@ -36,18 +36,17 @@ char* strdup(char* s) {
 }
 
 char HEX_CHARS[16] = "0123456789abcdef";
+char HEX_CHARS_UPPER[16] = "0123456789ABCDEF";
 
-char* u32_to_hex(u32 n) {
+char* u32_to_hex(u32 n, bool upper) {
   String_Buffer sb = {0};
   String_Buffer ret = {0};
-  da_append(&ret, '0');
-  da_append(&ret, 'x');
   if (n == 0) {
     da_append(&ret, '0');
   } else {
     while (n != 0) {
       u32 rem = n % 16;
-      da_append(&sb, HEX_CHARS[rem]);
+      da_append(&sb, upper ? HEX_CHARS_UPPER[rem] : HEX_CHARS[rem]);
       n = (u32)(n / 16);
     }
     for (u32 i = 1; i <= sb.size; ++i) {
@@ -59,7 +58,33 @@ char* u32_to_hex(u32 n) {
   return ret.items;
 }
 
+/*
+takes buffer as an argument,
+buffer needs to be at least 9 bytes for:
+up to 8 characters and a null terminator
+*/
+void u32_to_hex_buffer(u32 n, char* buf, bool upper) {
+  u32 out_index = 0;
+  i32 rev_index = 0;
+  if (n == 0) {
+    buf[out_index++] = '0';
+    buf[out_index]   = 0;
+    return;
+  }
+  char rev[8];
+  while (n != 0) {
+    rev[rev_index++] = upper ? HEX_CHARS_UPPER[n%16] : HEX_CHARS[n%16];
+    n /= 16;
+  }
+  while (rev_index > 0) {
+    buf[out_index++] = rev[--rev_index];
+  }
+  buf[out_index] = 0;
+}
+
 char* utoa(u32 n) {
+  // TODO: handle properly
+  if (n == 0) return "0";
   String_Buffer sb = {0};
   String_Buffer res = {0};
   while (n > 0) {
@@ -77,7 +102,32 @@ char* utoa(u32 n) {
   return res.items;
 }
 
+/*
+buffer needs to be at least 11 bytes for:
+up to 10 digits and a null terminator
+*/
+void utoa_buffer(u32 n, char* buf) {
+  if (n == 0) {
+    buf[0] = '0';
+    buf[1] = 0;
+    return;
+  }
+  u32 out_index = 0;
+  i32 rev_index = 0;
+  char rev[10];
+  while (n > 0) {
+    rev[rev_index++] = (n%10) + '0';
+    n /= 10;
+  }
+  while (rev_index > 0) {
+    buf[out_index++] = rev[--rev_index];
+  }
+  buf[out_index] = 0;
+}
+
 char* itoa(i32 n) {
+  // TODO: handle properly
+  if (n == 0) return "0";
   String_Buffer sb = {0};
   String_Buffer res = {0};
   if (n < 0) {
@@ -97,6 +147,35 @@ char* itoa(i32 n) {
   da_append(&res, 0);
   free(sb.items);
   return res.items;
+}
+
+/*
+this takes a buffer as an argument, 
+this buffer needs to be at least 12 bytes for 
+possible '-', up to 10 digits and a null terminator
+*/
+void itoa_buffer(i32 n, char* buf) {
+  if (n == 0) {
+    buf[0] = '0';
+    buf[1] = 0;
+    return;
+  }
+  u32 out_index = 0;
+  i32 rev_index = 0;
+  char rev[10];
+  if (n < 0) {
+    buf[out_index++] = '-';
+    // TODO: handle I32MIN overflow
+    n *= -1;
+  }
+  while (n > 0) {
+    rev[rev_index++] = (n%10) + '0';
+    n /= 10;
+  }
+  while (rev_index > 0) {
+    buf[out_index++] = rev[--rev_index];
+  }
+  buf[out_index] = 0;
 }
 
 u32 stou32(char* s) {
@@ -121,3 +200,5 @@ bool s_is_digits(char* s) {
   }
   return true;
 }
+
+// TODO: clean up this file

@@ -44,6 +44,8 @@ i32 main(Std s, Args args) {
         //std.mem.heap_dump();
         //return 30;
 
+        std.io.eprintln(cmd);
+
         if (std.str.strcmp(cmd, ":p") == true) {
           if (rest[0] != 0) {
             if (std.str.s_is_digits(rest)) {
@@ -69,6 +71,11 @@ i32 main(Std s, Args args) {
           } else {
             std.io.printf("a: No text supplied\n");
           }
+        } else if (std.str.strcmp(cmd, ":w") == true) {
+          std.io.eprintln("TODO: :w");
+        } else if (std.str.strcmp(cmd, ":q") == true) {
+          std.io.println("quitting.");
+          break;
         } else {
           std.io.printf("?\n");
         }
@@ -84,6 +91,5 @@ i32 main(Std s, Args args) {
     std.mem.free(lb->items[i]);
   }
   std.mem.free(lb->items);
-  std.io.printf("end");
   return 0;
 }

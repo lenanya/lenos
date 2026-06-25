@@ -4,6 +4,9 @@
 #include "io.h"
 #include "da.h"
 
+// TODO: debug the fuck out of
+// TODO: basically rewrite it
+
 void* __HEAP_BASE = NULL;
 void* __HEAP_TOP = NULL;
 
@@ -97,6 +100,7 @@ void* malloc(u32 size) {
 		mem_setup_heap_vars();
 		if ((u32)__HEAP_BASE + size > (u32)__HEAP_TOP) {
 			eprintln("malloc returning null");
+			// TODO: find out when tf this happens
 			return NULL;
 		}
 		u32 alloc_size = sizeof(Mem_Header) + size;
@@ -219,3 +223,5 @@ void give_allocation_name(void* mem, char* name) {
   Mem_Header* header = (Mem_Header*)(mem - sizeof(Mem_Header));
 	header->owner = name;
 }
+
+// TODO: valgrind like thing?

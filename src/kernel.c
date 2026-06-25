@@ -11,6 +11,7 @@
 #include "kernel_std/da.h"
 #include "kernel_std/file.h"
 #include "kernel_std/io.h"
+#include "kernel_std/serial.h"
 
 #include "progs/helloworld_contents.h"
 #include "progs/edit_contents.h"
@@ -19,7 +20,11 @@
 
 void add_prog(u8* data, u32 size, char* filename);
 
+
+// TODO: clean up
 void kernel_main() {
+  serial_init();
+  serial_printf("kernel_main(): 0x%04X\n", kernel_main);
   vga_clear_screen(VGA_CYAN_ON_GREY);
   vga_flip_buffer();
   String_Buffer cmd = {0};
@@ -175,3 +180,7 @@ void add_prog(u8* data, u32 size, char* filename) {
   }
   free(te);
 }
+
+// TODO: linking somehow?
+// TODO: make filesystem mountable/switch to existing FS (FAT?)
+// TODO: switch to actual graphical mode instead of text

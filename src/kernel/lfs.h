@@ -8,7 +8,6 @@ LFS_Table_Position lfs_find_first_free_table_block();
 u32 lfs_find_first_free();
 LFS_Superblock* lfs_get_superblock(void);
 void lfs_append_table(LFS_Table_Entry* te);
-u32 lfs_find_second_free();
 void lfs_write_superblock(LFS_Superblock* sb);
 void print_table_entry(LFS_Table_Entry* te);
 void lfs_delete_file(char* filename);
