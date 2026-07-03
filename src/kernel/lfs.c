@@ -37,7 +37,7 @@ LFS_Superblock* lfs_get_superblock(void) {
   u32 block = 1;
   do {
     for (u32 i = 0; i < 256; ++i) block_buf[i] = 0;
-    ata_read_sector(block, 1, block_buf);
+    ata_read_sector(block, block_buf);
     memncpy(block_buf, sb, sizeof(LFS_Superblock));
     if (sb->magic == LFS_MAGIC) {
       free(block_buf);
@@ -65,13 +65,13 @@ void lfs_append_table(LFS_Table_Entry* te) {
 
   u16* block_buffer = (u16*)malloc(512);
   give_allocation_name(block_buffer, "lfs_append_table");
-  ata_read_sector(sb_local->superblock_lba + p.lba, 1, block_buffer);
+  ata_read_sector(sb_local->superblock_lba + p.lba, block_buffer);
   if (p.after_last) {
     if (p.index != 0) {
       (((LFS_Table_Entry*)block_buffer)+(index-1))->last = false;
     } else {
       u16* bb2 = malloc(512);
-      ata_read_sector(sb_local->superblock_lba + p.lba - 1, 1, bb2);
+      ata_read_sector(sb_local->superblock_lba + p.lba - 1, bb2);
       (((LFS_Table_Entry*)block_buffer)+(7))->last = false;
       ata_write_sector(sb_local->superblock_lba + p.lba - 1, bb2);
       free(bb2);
@@ -98,7 +98,7 @@ LFS_Table_Entry* lfs_find_file(char* name) {
   give_allocation_name(block_buf, "lfs_find_file");
   while (block < LFS_MAX_BLOCKS) {
     if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) return NULL;
-    ata_read_sector(sb_local->superblock_lba + block, 1, block_buf);
+    ata_read_sector(sb_local->superblock_lba + block, block_buf);
     te = (LFS_Table_Entry*)block_buf;
     while ((u32)te < (u32)block_buf+512) {
       if (strcmp(te->name, name) == true) {
@@ -128,7 +128,7 @@ u32 lfs_find_first_free() {
   LFS_File_Block* fb = NULL;
   u32 lba = sb_local->data_lba;
   while (lba < LFS_MAX_BLOCKS) {
-    ata_read_sector(lba, 1, block_buf);
+    ata_read_sector(lba, block_buf);
     fb = (LFS_File_Block*)block_buf;
     
     if (!fb->flags) {
@@ -150,7 +150,7 @@ LFS_Table_Position lfs_find_first_free_table_block() {
 
   while (block < LFS_MAX_BLOCKS) {
     u32 current_lba = sb_local->superblock_lba + block;
-    ata_read_sector(current_lba, 1, (u16*)block_buf);
+    ata_read_sector(current_lba, (u16*)block_buf);
     LFS_Table_Entry* entries = (LFS_Table_Entry*)block_buf;
     
     for (u32 sector = 0; sector < 8; ++sector) {
@@ -204,7 +204,7 @@ void lfs_read_directory(Directory* dir) {
   te = (LFS_Table_Entry*)block_buf;
   do {
     if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
-    ata_read_sector(sb_local->superblock_lba + block, 1, block_buf);
+    ata_read_sector(sb_local->superblock_lba + block, block_buf);
     te = (LFS_Table_Entry*)block_buf;
     while ((u32)te < (u32)block_buf+512) {
       if (te->deleted) {
@@ -241,7 +241,7 @@ void lfs_delete_file(char* filename) {
   LFS_Table_Entry* te2 = (LFS_Table_Entry*)block_buf;
   do {
     if (sb_local->superblock_lba + block > LFS_MAX_BLOCKS) break;
-    ata_read_sector(sb_local->superblock_lba + block, 1, block_buf);
+    ata_read_sector(sb_local->superblock_lba + block, block_buf);
     for (u32 i = 0; i < 8; ++i) {
       te2 = ((LFS_Table_Entry*)block_buf)+i;
       if (strcmp(filename, te2->name) == true) {
@@ -260,7 +260,7 @@ void lfs_delete_file(char* filename) {
   done:
   while (lba != 0) {
     u32 lba2 = lba;
-    ata_read_sector(lba, 1, block_buf);
+    ata_read_sector(lba, block_buf);
     lba = ((LFS_File_Block*)block_buf)->next_block_lba;
     for (u32 i = 0; i < 256; ++i) {
       block_buf[i] = 0;

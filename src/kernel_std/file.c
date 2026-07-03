@@ -21,7 +21,7 @@ void read_entire_file(File_Buffer* fb, char* filename) {
   u16* block_buf = (u16*)malloc(512);
   u32 lba = te->file_first_lba;
   while (lba != 0) {
-    ata_read_sector(lba, 1, block_buf);
+    ata_read_sector(lba, block_buf);
     LFS_File_Block* fbl = (LFS_File_Block*)block_buf;
     lba = fbl->next_block_lba;
     for (u32 i = 0; i < 507 && fb->size < te->file_size; ++i) {

@@ -1,6 +1,6 @@
 all: build/lenos.bin
 
-CFLAGS = -m32 -ffreestanding -fno-pie -nostdlib -Wall -Wno-unused-variable -c \
+CFLAGS = -std=c11 -m32 -ffreestanding -fno-pie -nostdlib -Wall -Wno-unused-variable -c \
 				 -Wno-unused-value -fno-stack-protector -mno-sse -mno-sse2 -mno-mmx   \
 				 -mpreferred-stack-boundary=2 -O0 -Wextra -Wno-unused-parameter
 

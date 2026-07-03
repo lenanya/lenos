@@ -23,7 +23,7 @@ void ata_read_sector(u32 lba, u16* dest) {
 
   ata_wait_for_ready();
   for (i32 j = 0; j < 256; ++j) {
-    dest[i * 256 + j] = inw(ATA_DATA);
+    dest[j] = inw(ATA_DATA);
   }
 }
 
